@@ -3,7 +3,7 @@ import { BrowserWindow } from 'electron';
 const logBuffer: { timestamp: string, type: 'info' | 'error', message: string }[] = [];
 const MAX_LOGS = 1000;
 
-export function addToLog(type: 'info' | 'error', ...args: unknown[]) {
+export function addToLog(type: 'info' | 'error', ...args: any[]) {
     const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' ');
     
     const newLog = {

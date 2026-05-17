@@ -7,33 +7,11 @@ import { ytDlp, activeSearches, activeDownloads } from '../streaming.js';
 import { StoreSchema, schema } from '../store.js';
 import Store from 'electron-store';
 
-const store = new Store<StoreSchema>({ schema: schema as Record<string, unknown> }); 
+const store = new Store<StoreSchema>({ schema: schema as any }); 
 
-type TrackArtist = string | { name?: string };
-
-type TrackData = {
-    id?: string;
-    trackId?: string;
-    name?: string;
-    artists?: TrackArtist[];
-    artist?: string;
-    albumName?: string;
-    album?: {
-        name?: string;
-        images?: { url?: string }[];
-    };
-    albumArt?: string;
-    albumArtFull?: string;
-    images?: { url?: string }[];
-    durationMs?: number;
-    duration_ms?: number;
-    duration?: { totalMilliseconds?: number };
-    trackDuration?: { totalMilliseconds?: number };
-};
-
-function normalizeTrackForDB(track: TrackData) {
+function normalizeTrackForDB(track: any) {
     const artist = Array.isArray(track.artists)
-        ? track.artists.map((a: TrackArtist) => typeof a === 'string' ? a : (a.name || '')).join(', ')
+        ? track.artists.map((a: any) => typeof a === 'string' ? a : (a.name || '')).join(', ')
         : track.artist || 'Unknown Artist';
 
     return {
@@ -55,9 +33,7 @@ export function registerStreamingHandlers() {
             try {
                 await fs.promises.access(customDir);
                 return customDir;
-            } catch (e) {
-                // Ignore missing directory error
-            }
+            } catch (e) {}
         }
         const defaultDir = path.join(app.getPath('userData'), 'downloads');
         try {
@@ -71,14 +47,12 @@ export function registerStreamingHandlers() {
     ipcMain.handle('get-stream-url', async (_event, trackName: string, artistName: string, trackId: string = 'unknown', isPriority: boolean = false, requester: string = 'unknown') => {
         try {
             if (trackId && trackId !== 'unknown' && db) {
-                const local = db.prepare('SELECT localPath FROM downloads WHERE id = ?').get(trackId) as { localPath?: string } | undefined;
+                const local = db.prepare('SELECT localPath FROM downloads WHERE id = ?').get(trackId);
                 if (local && local.localPath) {
                     try {
                         await fs.promises.access(local.localPath);
                         return `lune-local://f/${Buffer.from(local.localPath).toString('hex')}`;
-                    } catch (e) {
-                        // Ignore missing file error
-                    }
+                    } catch (e) {}
                 }
             }
 
@@ -117,8 +91,8 @@ export function registerStreamingHandlers() {
                     }
                 }
             }
-        } catch (error: unknown) {
-            if (error instanceof Error && error.name === 'AbortError') {
+        } catch (error: any) {
+            if (error.name === 'AbortError') {
                 return '';
             }
             console.error('Error fetching stream URL:', error);
@@ -196,7 +170,7 @@ export function registerStreamingHandlers() {
         }
 
         try {
-            const existing = db.prepare('SELECT localPath FROM downloads WHERE id = ?').get(normalized.id) as { localPath?: string } | undefined;
+            const existing = db.prepare('SELECT localPath FROM downloads WHERE id = ?').get(normalized.id);
             if (existing && existing.localPath) {
                 if (fs.existsSync(existing.localPath)) {
                     return true;
@@ -276,7 +250,7 @@ export function registerStreamingHandlers() {
         }
         if (!db) return false;
         try {
-            const existing = db.prepare('SELECT localPath FROM downloads WHERE id = ?').get(id) as { localPath?: string } | undefined;
+            const existing = db.prepare('SELECT localPath FROM downloads WHERE id = ?').get(id);
             if (existing && existing.localPath) {
                 try {
                     await fs.promises.unlink(existing.localPath);

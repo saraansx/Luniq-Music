@@ -2,31 +2,9 @@ import { ipcMain } from 'electron';
 import fs from 'fs';
 import { getDatabase } from '../database.js';
 
-type TrackArtist = string | { name?: string };
-
-type TrackData = {
-    id?: string;
-    trackId?: string;
-    name?: string;
-    artists?: TrackArtist[];
-    artist?: string;
-    albumName?: string;
-    album?: {
-        name?: string;
-        images?: { url?: string }[];
-    };
-    albumArt?: string;
-    albumArtFull?: string;
-    images?: { url?: string }[];
-    durationMs?: number;
-    duration_ms?: number;
-    duration?: { totalMilliseconds?: number };
-    trackDuration?: { totalMilliseconds?: number };
-};
-
-function normalizeTrackForDB(track: TrackData) {
+function normalizeTrackForDB(track: any) {
     const artist = Array.isArray(track.artists)
-        ? track.artists.map((a: TrackArtist) => typeof a === 'string' ? a : (a.name || '')).join(', ')
+        ? track.artists.map((a: any) => typeof a === 'string' ? a : (a.name || '')).join(', ')
         : track.artist || 'Unknown Artist';
 
     return {
@@ -175,7 +153,7 @@ export function registerDatabaseHandlers() {
             
             // Perform existence checks in parallel
             const checkResults = await Promise.all(
-                (items as Array<Record<string, unknown> & { id: string; localPath?: string }>).map(async (item) => {
+                items.map(async (item: any) => {
                     if (!item.localPath) return { item, exists: false };
                     try {
                         await fs.promises.access(item.localPath);
@@ -216,7 +194,7 @@ export function registerDatabaseHandlers() {
     ipcMain.handle('check-is-downloaded', async (_event, id) => {
         if (!db) return false;
         try {
-            const result = db.prepare('SELECT localPath FROM downloads WHERE id = ?').get(id) as { localPath?: string } | undefined;
+            const result = db.prepare('SELECT localPath FROM downloads WHERE id = ?').get(id);
             if (result && result.localPath) {
                 try {
                     await fs.promises.access(result.localPath);
@@ -290,7 +268,6 @@ export function registerDatabaseHandlers() {
     });
 
     ipcMain.handle('get-playlist', (_event, id) => {
-        if (!db) return null;
         try {
             const stmt = db.prepare('SELECT * FROM playlists WHERE id = ?');
             return stmt.get(id);
@@ -353,8 +330,8 @@ export function registerDatabaseHandlers() {
         if (!db) return [];
         try {
             const stmt = db.prepare('SELECT playlistId FROM playlist_tracks WHERE trackId = ?');
-            const results = stmt.all(trackId) as Array<{ playlistId: string }>;
-            return results.map((r) => r.playlistId);
+            const results = stmt.all(trackId);
+            return results.map((r: any) => r.playlistId);
         } catch (error) {
             console.error('Get Track Playlists Error', error);
             return [];

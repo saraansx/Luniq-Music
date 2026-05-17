@@ -1,7 +1,7 @@
 export interface StoreSchema {
     // Authentication
     spotify_access_token?: string;
-    spotify_cookies?: { name: string; value: string; [key: string]: unknown }[]; // Storing cookies array which contains sp_dc
+    spotify_cookies?: any[]; // Storing cookies array which contains sp_dc
     spotify_expires_at?: number; // timestamp when token expires
 
     // App Settings

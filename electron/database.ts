@@ -10,7 +10,7 @@ if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true });
 }
 
-let db: Database.Database | undefined;
+let db: any;
 
 export function getDatabase() {
     if (db) return db;

@@ -1,9 +1,7 @@
-import { ipcRenderer, contextBridge, IpcRendererEvent } from 'electron'
-
-type IpcCallback = (event: IpcRendererEvent, ...args: unknown[]) => void;
+import { ipcRenderer, contextBridge } from 'electron'
 
 // Track original listeners and their wrappers to prevent memory leaks
-const listenerMap = new Map<string, Map<unknown, IpcCallback>>();
+const listenerMap = new Map<string, Map<any, any>>();
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -11,7 +9,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     const [channel, listener] = args;
     
     // Create a wrapper that correctly passes the event and arguments
-    const wrapper = (event: IpcRendererEvent, ...args: unknown[]) => listener(event, ...args);
+    const wrapper = (event: any, ...args: any[]) => listener(event, ...args);
     
     // Store the wrapper in the map for future removal
     if (!listenerMap.has(channel)) {
@@ -25,7 +23,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return () => {
       const currentWrapper = listenerMap.get(channel)?.get(listener);
       if (currentWrapper) {
-        ipcRenderer.removeListener(channel, currentWrapper as Parameters<typeof ipcRenderer.removeListener>[1]);
+        ipcRenderer.removeListener(channel, currentWrapper);
         listenerMap.get(channel)?.delete(listener);
       }
     };
@@ -37,7 +35,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     // Retrieve the wrapper associated with this listener
     const wrapper = listenerMap.get(channel)?.get(listener);
     if (wrapper) {
-      ipcRenderer.off(channel, wrapper as Parameters<typeof ipcRenderer.off>[1]);
+      ipcRenderer.off(channel, wrapper);
       listenerMap.get(channel)!.delete(listener);
     }
   },
