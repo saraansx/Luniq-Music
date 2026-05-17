@@ -298,12 +298,7 @@ async function harvestYouTubeCookies(): Promise<boolean> {
     }
 }
 
-  // Track current app version
-  store.set('app_version', app.getVersion());
 
-  // Increment startup count
-  const count = (store.get('startup_count') || 0) + 1;
-  store.set('startup_count', count);
 
 // App Lifecycle
 app.whenReady().then(async () => {
@@ -347,12 +342,12 @@ app.whenReady().then(async () => {
         if (manual) {
           win?.webContents.send('ytdlp-update-status', { 
             status: 'error', 
-            message: err.message?.includes('403') ? 'Rate limit exceeded. Try again later.' : 'Failed to update playback drivers.' 
+            message: error.message?.includes('403') ? 'Rate limit exceeded. Try again later.' : 'Failed to update playback drivers.' 
           });
         }
         
         // If rate limited, set last update to almost now so we don't spam 403s
-        if (err.message?.includes('403')) {
+        if (error.message?.includes('403')) {
            store.set('lastYtdlpUpdate', Date.now() - (23 * 60 * 60 * 1000)); 
         }
 
