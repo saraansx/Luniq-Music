@@ -1,3 +1,4 @@
+import './shim.js';
 import { app, BrowserWindow, ipcMain, Menu, protocol, globalShortcut, session, Tray, nativeImage } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import * as nodeUrl from 'node:url'
