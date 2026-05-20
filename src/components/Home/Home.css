@@ -52,8 +52,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   opacity: 0.6;
   padding: 4px 0;
 }
