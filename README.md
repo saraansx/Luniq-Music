@@ -3,14 +3,14 @@
 
   <br />
 
-  <h1>─── ✧ L U N E ✧ ───</h1>
+  <h1>─── ✧ L U N E &nbsp; M U S I C ✧ ───</h1>
 
-  <p>Lune is a lightweight, open-source desktop music player that leverages Spotify's metadata to deliver ad-free streaming with smart autoplay capabilities, entirely without the need for a paid subscription. Built for performance and beautifully designed, it offers a fast and distraction-free environment for your entire music library.</p>
+  <p><b>Lune Music</b> (also known as <b>Lune</b>) is a lightweight, open-source desktop music player developed by <b>saraansx</b>. It leverages Spotify's metadata to deliver ad-free streaming with smart autoplay capabilities, entirely without the need for a paid subscription. Built for performance and beautifully designed, it offers a fast and distraction-free environment for your entire music library.</p>
 
   <br />
 
   <p>
-    <a href="https://github.com/saraansx/Lune/blob/main/LicENSE">
+    <a href="https://github.com/saraansx/Lune-Music/blob/main/LicENSE">
       <img src="https://img.shields.io/badge/License-GPL--3.0-transparent?style=flat&color=C0C0C0&labelColor=333333" alt="License: GPL v3" />
     </a>
     <img src="https://img.shields.io/badge/Platform-Desktop-transparent?style=flat&color=C0C0C0&labelColor=333333" alt="Platform: Desktop" />
@@ -45,14 +45,14 @@
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows8/windows8-original.svg" width="16" height="16" alt="Windows" style="vertical-align: middle;"/> Windows - [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) | `winget install saraansx.Lune` |
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows8/windows8-original.svg" width="16" height="16" alt="Windows" style="vertical-align: middle;"/> Windows - [Scoop](https://scoop.sh/) | `scoop bucket add saraansx https://github.com/saraansx/scoop-bucket`<br>`scoop install lune` |
 
-_Or grab the latest setup directly from **[Releases](https://github.com/saraansx/Lune/releases)**._
+_Or grab the latest setup directly from **[Releases](https://github.com/saraansx/Lune-Music/releases)**._
 
 <br />
 
 ### / Development
 
 ```bash
-git clone https://github.com/saraansx/Lune.git
+git clone https://github.com/saraansx/Lune-Music.git
 cd Lune
 npm install
 npm run dev
@@ -96,18 +96,18 @@ Enjoying Lune? Consider giving us a ⭐ to support the development and join our 
 
 ### / Engagement
 
-[![Star History Chart](https://api.star-history.com/svg?repos=saraansx/Lune&type=Date)](https://star-history.com/#saraansx/Lune&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=saraansx/Lune-Music&type=Date)](https://star-history.com/#saraansx/Lune-Music&Date)
 
 <br />
 
 ### / License
 
-Lune is proudly open-source and licensed under the **[GPL-3.0 License](https://github.com/saraansx/Lune/blob/main/LicENSE)**.
+Lune is proudly open-source and licensed under the **[GPL-3.0 License](https://github.com/saraansx/Lune-Music/blob/main/LicENSE)**.
 
 This ensures that the project remains free and open. Any modifications or derivative works distributed to others must also be open-source and released under the same license.
 
 ---
 
 <div align="center">
-  <sub>✦ Lune ─ Crafted for the Aesthetic Listener ✦</sub>
+  <sub>✦ Lune Music by saraansx ─ Crafted for the Aesthetic Listener ✦</sub>
 </div>

@@ -30,7 +30,7 @@ const StarPopup = () => {
     }, []);
 
     const handleStar = async () => {
-        await window.ipcRenderer.invoke('open-external', 'https://github.com/saraansx/Lune');
+        await window.ipcRenderer.invoke('open-external', 'https://github.com/saraansx/Lune-Music');
         await window.ipcRenderer.invoke('set-setting', 'has_starred', true);
         setIsVisible(false);
     };

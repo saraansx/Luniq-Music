@@ -146,7 +146,7 @@ const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
                 <div className="about-modal-links">
                     <button
                         className="about-modal-link-btn"
-                        onClick={() => window.ipcRenderer?.invoke('open-external', 'https://github.com/saraansx/Lune')}
+                        onClick={() => window.ipcRenderer?.invoke('open-external', 'https://github.com/saraansx/Lune-Music')}
                         title="GitHub"
                     >
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -182,7 +182,7 @@ const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
                     <span className="about-meta-label">{t('about.license')}</span>
                     <span
                         className="about-meta-value about-meta-link"
-                        onClick={() => window.ipcRenderer?.invoke('open-external', 'https://github.com/saraansx/Lune?tab=GPL-3.0-1-ov-file')}
+                        onClick={() => window.ipcRenderer?.invoke('open-external', 'https://github.com/saraansx/Lune-Music?tab=GPL-3.0-1-ov-file')}
                     >
                         GPL-3.0
                     </span>
@@ -191,9 +191,9 @@ const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
                     <span className="about-meta-label">{t('about.repository')}</span>
                     <span
                         className="about-meta-value about-meta-link"
-                        onClick={() => window.ipcRenderer?.invoke('open-external', 'https://github.com/saraansx/Lune')}
+                        onClick={() => window.ipcRenderer?.invoke('open-external', 'https://github.com/saraansx/Lune-Music')}
                     >
-                        github.com/saraansx/Lune
+                        github.com/saraansx/Lune-Music
                     </span>
                 </div>
                 <div className="about-modal-meta">

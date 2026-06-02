@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://github.com/saraansx/Lune/sitemap.xml
+Sitemap: https://github.com/saraansx/Lune-Music/sitemap.xml
