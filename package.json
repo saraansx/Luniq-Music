@@ -1,11 +1,11 @@
 {
-  "name": "lune",
+  "name": "lune-music",
   "license": "GPL-3.0",
   "private": true,
   "version": "1.0.3",
   "buildVersion": "4",
   "description": "Lune Open Source Music Player",
-  "author": "Lune Devs",
+  "author": "saraansx",
   "type": "module",
   "scripts": {
     "dev": "vite",
