@@ -423,7 +423,7 @@ const PlayerBar: React.FC<{
             baseTrack.artists?.[0]?.id ?? undefined,
             30,
           ),
-          new Promise<LuneTrack[]>((_, reject) =>
+          new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error("Spotify API Timeout")), 8000),
           ),
         ]);
