@@ -2,7 +2,43 @@
 
 All notable changes to Lune will be documented in this file.
 
+## [1.0.4] - 2026-06-13
+
+### Audio Engine, Discord RPC & Reliability Overhaul
+
+This release is a major under-the-hood upgrade focused on audio quality, rich presence stability, playback reliability, and infrastructure hardening.
+
+#### Added
+
+- **Appearance Settings & Theme Context:** A new `ThemeProvider` enables dynamic accent color selection and layout density modes (Comfortable/Compact/Cozy), all persisted via `electron-store`.
+- **Home Page Redesign:** New Home view with curated section layouts, responsive card grids, and compact-mode density support.
+- **Custom NSIS Installer:** A custom Windows installer script with user-selectable post-install options: create desktop shortcut, launch on startup, open immediately.
+- **yt-dlp Auto-Updater:** The app automatically checks for `yt-dlp` binary updates once per day on startup. A manual "Check for Updates" trigger is also exposed in the Settings UI.
+- **yt-dlp Auto-Repair:** If the `yt-dlp` binary becomes corrupted (e.g. PyInstaller decompression failure, exit code `4294967295`), the app now automatically detects this and downloads a fresh binary from the official GitHub releases to self-heal — no manual intervention required.
+- **YouTube Cookie Harvesting:** The main process silently opens a hidden browser partition to harvest fresh YouTube session cookies and passes them to `yt-dlp`, improving stream fetch success rates and bypassing some geo-restrictions.
+- **Audio Output Device Switching:** The player now supports switching the audio output device at runtime via `setSinkId`, allowing users to route audio to any connected speaker or headset.
+- **Playback Speed Control:** Real-time playback speed adjustment exposed through settings and applied directly to the HTML audio element.
+- **Structured Data & SEO:** Added `schema.org` structured data, `robots.txt`, and `sitemap.xml` for better discoverability.
+
+#### Changed
+
+- **yt-dlp Multi-Client Fallback:** Stream fetching now tries multiple YouTube player clients (`mweb`, `default`) in sequence. If the primary client is blocked, the app silently falls back instead of failing.
+- **Streaming Handler Robustness:** Enhanced retry logic, in-memory URL caching (30 min TTL), and deduplication of concurrent fetches for the same track ID. Multiple components requesting the same stream now share a single network request.
+- **Autoplay Radio Pool:** The `AutoplayQueue` radio pool system now seeds from the tail of the queue for better continuity, shuffles candidates immediately, and de-duplicates by recent artist history for variety.
+- **Close-to-Tray Behavior:** The window `close` event is intercepted and the app hides to tray by default, with user-configurable option to close outright.
+- **Improved RPC Stability:** Discord RPC now handles connection failures gracefully with a proper retry strategy. An unresponsive or absent Discord client no longer throws unhandled errors.
+- **PlayerBar Enhancements:** Improved player bar UI interactions, state synchronization, and progress bar sizing.
+
+#### Fixed
+
+- **yt-dlp Binary Corruption (Critical):** Fixed a crash-to-desktop bug affecting all users where a corrupted `yt-dlp.exe` triggered a Windows stack-buffer-overrun error (`0xC0000409`). The PyInstaller bootstrap was failing to decompress internal modules. The app now auto-repairs by re-downloading a clean binary from GitHub — no manual fix required.
+- **Ghost Song / Audio Bleed:** Fixed a race condition where rapidly skipping tracks would leave the previous track's audio element playing beneath the new one. The audio element source is now force-cleared and reloaded on every track change.
+- **Memory Leak in Prefetch Map:** The audio URL prefetch cache is now bounded and auto-pruned to 5 entries, preventing long listening sessions from leaking RAM.
+- **Audio Graph CPU Waste:** The `AnalyserNode` is now only connected when Volume Normalization is active, preventing unnecessary DSP computation during normal playback.
+- **CPU Drain on Normalization:** The normalization interval is now properly cleaned up when normalization is disabled or the track is paused, stopping a background polling loop that ran indefinitely.
+
 ## [1.0.3] - 2026-03-14
+
 
 ### Self-Healing Authentication & Session Resiliency
 
@@ -26,7 +62,6 @@ This update introduces a robust, proactive authentication system that automatica
 - **Clear Queue Logic:** Fixed a bug where clicking the "Clear Queue" button wouldn't properly clear the list if Shuffle mode was enabled.
 - **Persistent "Log out anyway" Bug:** Fixed a logic error where the app would mark a session as invalid if a background refresh failed once, which previously forced users to manually log out and back in to fix the "Could not load profile" error in settings.
 - **Refresh Timer Suspension:** Corrected a bug in the token refresh logic where an already-expired token would wait 5 minutes to retry; it now retries in the background with increasing frequency while keeping the UI active.
-
 
 ## [1.0.2] - 2026-03-12
 

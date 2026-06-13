@@ -2,8 +2,9 @@
   "name": "lune-music",
   "license": "GPL-3.0",
   "private": true,
-  "version": "1.0.3",
-  "buildVersion": "4",
+  "version": "1.0.4",
+  "buildVersion": "5",
+
   "description": "Lune Open Source Music Player",
   "author": "saraansx",
   "type": "module",
