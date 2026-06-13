@@ -16,7 +16,7 @@ Thumbs.db
 
 # Project specific
 yt-cookies.txt
-downloads/
+/downloads/
 *.sqlite
 *.sqlite-journal
 

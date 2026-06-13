@@ -1,0 +1,43 @@
+.downloads-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.downloads-info-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.downloads-icon-wrapper {
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+}
+
+.downloads-text-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.downloads-label {
+  font-weight: 500;
+}
+
+.downloads-sub {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.downloads-folder-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  cursor: pointer;
+}
