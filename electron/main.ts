@@ -340,6 +340,28 @@ app.whenReady().then(async () => {
       } catch (err) {
         console.warn('[Main] yt-dlp update failed:', err);
         const error = err as Error;
+
+        // Auto-repair for corrupted yt-dlp binary
+        if (error.message?.includes('4294967295') || error.message?.includes('PYI-')) {
+          console.log('[Main] yt-dlp binary seems corrupted. Attempting auto-repair...');
+          if (manual) win?.webContents.send('ytdlp-update-status', { status: 'downloading', message: 'Repairing corrupted playback drivers...' });
+          try {
+            const res = await fetch('https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe');
+            if (res.ok) {
+              const arrayBuffer = await res.arrayBuffer();
+              await fs.promises.writeFile(ytDlpBinaryPath, Buffer.from(arrayBuffer));
+              console.log('[Main] Auto-repair successful!');
+              if (manual) {
+                // Wait briefly and retry update to confirm it's fixed
+                setTimeout(() => checkYtdlpUpdate(true), 1000);
+              }
+              return;
+            }
+          } catch (repairErr) {
+            console.error('[Main] Auto-repair failed:', repairErr);
+          }
+        }
+
         if (manual) {
           win?.webContents.send('ytdlp-update-status', { 
             status: 'error', 
