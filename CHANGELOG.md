@@ -2,6 +2,14 @@
 
 All notable changes to Lune will be documented in this file.
 
+## [1.0.5] - 2026-06-18
+
+### Stability & Bug Fixes
+
+#### Fixed
+
+- **Native Module Crash (Critical):** Fixed a critical "stack-based buffer overrun" crash that occurred randomly due to an ABI mismatch between Electron's internal Node.js engine and native modules (like `better-sqlite3`).
+
 ## [1.0.4] - 2026-06-13
 
 ### Audio Engine, Discord RPC & Reliability Overhaul
