@@ -33,7 +33,6 @@ yarn-error.log*
 
 # Build outputs
 dist/
-build/
 *.log
 
 # Environment files
@@ -42,7 +41,6 @@ build/
 !.env.example
 
 # IDE files
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -58,9 +56,9 @@ Thumbs.db
 
 # Sensitive files (auto-detected)
 .env
-build
 dist
 dist-electron
 electron-builder.json
 node_modules
 ArchiveTune-main/
+core-main/
