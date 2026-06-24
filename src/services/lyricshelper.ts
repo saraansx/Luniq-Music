@@ -91,7 +91,7 @@ export const fetchLyricsSmart = async (
     console.log(`[LyricsHelper] Fetching lyrics for: ${cleanTrackName} by ${primaryArtist}`);
 
     console.log(`[LyricsHelper] Step 1: Requesting from Primary Provider (Native Spotify)...`);
-    let data = await fetchSpotifyLyrics(cleanTrackName, primaryArtist, duration, albumName);
+    let data = await fetchSpotifyLyrics(cleanTrackName, primaryArtist, duration, albumName, videoId);
     
     if (data) {
         console.log(`[LyricsHelper] Native Spotify matched successfully!`);

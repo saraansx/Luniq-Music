@@ -4,7 +4,8 @@ export const fetchSpotifyLyrics = async (
     trackName: string,
     artistName: string,
     duration?: number,
-    albumName?: string
+    albumName?: string,
+    providedTrackId?: string
 ): Promise<LyricData | null> => {
     const cleanTrack = trackName.trim();
     const cleanArtist = artistName.trim();
@@ -20,37 +21,39 @@ export const fetchSpotifyLyrics = async (
         }
 
         const token = creds.accessToken;
-        const query = `${cleanTrack} ${cleanArtist}`;
+        let trackId = providedTrackId;
 
-        // 2. Search Spotify API to get the trackId
-        const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`;
-        const searchRes = await fetch(searchUrl, {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-
-        if (!searchRes.ok) {
-            console.warn(`[Lyrics] Spotify API search failed with status: ${searchRes.status}`);
-            return null;
-        }
-
-        const searchData = await searchRes.json();
-        const trackItems = searchData?.tracks?.items;
-        if (!trackItems || trackItems.length === 0) return null;
-
-        // Use duration to find the best match if possible, otherwise use top result
-        let bestMatch = trackItems[0];
-        if (duration && duration > 0 && trackItems.length > 1) {
-            const durationMs = duration * 1000;
-            bestMatch = trackItems.reduce((prev: any, curr: any) => {
-                const prevDiff = Math.abs((prev.duration_ms || 0) - durationMs);
-                const currDiff = Math.abs((curr.duration_ms || 0) - durationMs);
-                return currDiff < prevDiff ? curr : prev;
+        if (!trackId || trackId.length !== 22) {
+            const query = `${cleanTrack} ${cleanArtist}`;
+            const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`;
+            const searchRes = await fetch(searchUrl, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
+
+            if (!searchRes.ok) {
+                console.warn(`[Lyrics] Spotify API search failed with status: ${searchRes.status}`);
+
+                return null;
+            }
+
+            const searchData = await searchRes.json();
+            const trackItems = searchData?.tracks?.items;
+            if (!trackItems || trackItems.length === 0) return null;
+
+            let bestMatch = trackItems[0];
+            if (duration && duration > 0 && trackItems.length > 1) {
+                const durationMs = duration * 1000;
+                bestMatch = trackItems.reduce((prev: any, curr: any) => {
+                    const prevDiff = Math.abs((prev.duration_ms || 0) - durationMs);
+                    const currDiff = Math.abs((curr.duration_ms || 0) - durationMs);
+                    return currDiff < prevDiff ? curr : prev;
+                });
+            }
+            trackId = bestMatch.id;
         }
 
-        const trackId = bestMatch.id;
         if (!trackId) return null;
 
         // 3. Fetch native color-lyrics from spclient
@@ -95,11 +98,11 @@ export const fetchSpotifyLyrics = async (
 
         return {
             id: Date.now(),
-            name: bestMatch.name || cleanTrack,
-            trackName: bestMatch.name || cleanTrack,
-            artistName: bestMatch.artists?.[0]?.name || cleanArtist,
-            albumName: bestMatch.album?.name || albumName || "",
-            duration: Math.floor((bestMatch.duration_ms || 0) / 1000) || duration || 0,
+            name: cleanTrack,
+            trackName: cleanTrack,
+            artistName: cleanArtist,
+            albumName: albumName || "",
+            duration: duration || 0,
             instrumental: false,
             plainLyrics: plainStr.trim(),
             syncedLyrics: isSynced ? lrcStr.trim() : "",
