@@ -138,6 +138,7 @@ if (!gotTheLock) {
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
+      webSecurity: false,
     },
   })
 
