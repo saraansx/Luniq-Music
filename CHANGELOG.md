@@ -4,6 +4,16 @@ All notable changes to Lune will be documented in this file.
 
 ## [1.0.6] - 2026-06-21
 
+### Audio Engine, Search & Playback
+
+#### Added
+
+- **New Audio Engine (youtubei.js):** Replaced the previous stream resolver with a fully native `youtubei.js`-powered audio engine. No external binaries required for stream resolution — faster, cleaner, and more reliable.
+- **YouTube + Spotify Integrated Universal Search:** Search now queries both YouTube Music and Spotify simultaneously, merging results into a single unified view with deduplication.
+- **Smarter Track Matching (ArchiveTune Algorithm):** The audio engine now selects the best YouTube video for a track using a multi-factor scoring system ported from ArchiveTune — tokenized title/artist coverage checks, strict duration filtering, and a weighted scoring system. No more accidental covers, karaoke, or wrong versions.
+- **Extended Client Fallback Chain:** Stream resolution now attempts multiple YouTube clients in order before giving up: `TV → IOS → ANDROID → WEB_REMIX → WEB → default`. Drastically reduces playback failures.
+- **Autoplay Queue UI:** Queue panel now shows a dedicated "Next in Autoplay" section below the regular queue (Spotify-style), with a live loading indicator while the radio pool is being filled.
+
 ### Bug Fixes & Code Cleanup
 
 #### Changed
@@ -12,6 +22,7 @@ All notable changes to Lune will be documented in this file.
 - **Codebase Cleanup:** Automatically stripped all comments from the `src`, `electron`, and `Plugin` directories.
 
 #### Fixed
+- **Autoplay Queue Persistence:** The "Next in Autoplay" pool is now saved to local storage and restored on app restart. Previously it was lost every time the app closed.
 - **yt-dlp Binary Update Failure:** Fixed a bug where `yt-dlp.exe` could not update in production builds because it was locked inside the read-only `.asar` package. The binary is now correctly migrated to the user's local `AppData` directory upon launch, granting it full permissions to overwrite itself.
 - **Build Configuration Schema:** Suppressed false-positive IDE schema warnings in `electron-builder.json` by removing the outdated schema URL.
 - **Type Declaration Missing:** Restored Vite's client typings (`/// <reference types="vite/client" />`) in `vite-env.d.ts` to fix missing module errors for image assets in the IDE.
