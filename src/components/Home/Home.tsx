@@ -196,7 +196,7 @@ const Home = ({ accessToken: _accessToken, cookies, onPlaylistSelect, onTrackVie
             const id = item.uri?.split(':').pop() || item.id;
             onArtistSelect(id);
         } else if (onTrackViewSelect) {
-            // Fallback: unknown type, open as track detail view
+                                                                
             console.log('[Home] Unknown type, opening as track view');
             onTrackViewSelect({
                 id: item.uri?.split(':').pop() || item.id,

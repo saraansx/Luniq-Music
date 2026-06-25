@@ -52,7 +52,7 @@ export class YoutubeMusicSearch {
             const columns = renderer.flexColumns;
             if (!columns || columns.length < 2) return null;
 
-            // Title is usually in flexColumn 0
+                                               
             const titleRun = columns[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0];
             const title = titleRun?.text;
             const videoId = renderer.playlistItemData?.videoId || titleRun?.navigationEndpoint?.watchEndpoint?.videoId;
@@ -79,7 +79,7 @@ export class YoutubeMusicSearch {
                 } else if (/^\d+:\d+/.test(run.text)) {
                     durationText = run.text;
                 } else if (!pageType && i === 0 && !run.text.match(/^\d+:\d+/)) {
-                    // Fallback for artists without links
+                                                         
                     artists.push({ name: run.text, id: null });
                 }
             }

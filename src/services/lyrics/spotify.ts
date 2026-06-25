@@ -12,7 +12,7 @@ export const fetchSpotifyLyrics = async (
     if (!cleanTrack || !cleanArtist) return null;
 
     try {
-        // 1. Securely grab the Spotify Token from Lune's internal IPC
+                                                                      
         if (!(window as any).ipcRenderer) return null;
         const creds = await (window as any).ipcRenderer.invoke('get-spotify-credentials', false);
         if (!creds || !creds.accessToken) {
@@ -56,7 +56,7 @@ export const fetchSpotifyLyrics = async (
 
         if (!trackId) return null;
 
-        // 3. Fetch native color-lyrics from spclient
+                                                     
         const lyricsUrl = `https://spclient.wg.spotify.com/color-lyrics/v2/track/${trackId}?format=json&vocalRemoval=false`;
         const lyricsRes = await fetch(lyricsUrl, {
             headers: {

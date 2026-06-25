@@ -8,7 +8,7 @@ import { fetchUnisonLyrics } from './lyrics/unison';
 import { fetchSimpMusicLyrics } from './lyrics/simpmusic';
 import { transliterate } from 'transliteration';
 
-// Custom Romanizer
+                   
 const ensureRomanized = (data: LyricData): LyricData => {
     if (!data.romanizedLyrics) {
         if (data.syncedLyrics) {
@@ -119,7 +119,7 @@ export const fetchLyricsSmart = async (
         return data;
     }
 
-    // 5. Absolute Failure
+                          
     console.log(`[LyricsHelper] All 8 providers failed to find lyrics for: ${cleanTrackName}`);
     localStorage.setItem(cacheKey, 'NOT_FOUND');
     return null;

@@ -18,7 +18,7 @@ interface CreatePlaylistModalProps {
 const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({ onClose, onCreate, editData }) => {
     const [name, setName] = useState(editData?.name || '');
     const [description, setDescription] = useState(editData?.description || '');
-    // ... existing initialization ...
+                                      
     const [artwork, setArtwork] = useState<string | null>(editData?.artwork || null);
     const [loading, setLoading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);

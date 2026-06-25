@@ -316,7 +316,7 @@ export class YoutubeiAudio {
         for (const video of searchResults.videos) {
           const cDuration = (video as any).duration?.seconds || 0;
           if (!matchesDuration(cDuration, expectedDurationSecs)) {
-            continue; // Filter out candidates outside duration tolerance
+            continue;                                                    
           }
 
           const score = calculateScore(

@@ -118,7 +118,7 @@ const NowPlayingView: React.FC<{
                 if (type === 'playlist' || type === 'album') {
                     onPlaylistSelect?.(id, type === 'album');
                 } else if (type === 'artist') {
-                    onArtistSelect?.(id, ''); // We have the ID from the spotify: link
+                    onArtistSelect?.(id, '');                                         
                 }
             }
         }

@@ -316,7 +316,7 @@ const PlayerBar: React.FC<{
     applyDevice();
   }, [audioDeviceId, audioRefCurrent]);
 
-  // ── Playback Speed Logic ───────────────────────────────────
+                                                                
   const audioRefCurrent2 = !!audioRef.current;
   useEffect(() => {
     if (audioRef.current) {

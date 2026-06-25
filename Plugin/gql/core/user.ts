@@ -97,7 +97,7 @@ class SpotifyUserEndpoint {
                 const uri = trackWrapper._uri || track.uri || track._uri || "";
                 const id = uri ? uri.split(":").pop() : "";
 
-                // Album: new structure uses "albumOfTrack", legacy uses "album"
+                                                                                
                 const albumData = track.albumOfTrack || track.album;
 
                 return {

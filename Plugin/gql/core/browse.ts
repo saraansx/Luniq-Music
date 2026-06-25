@@ -152,7 +152,7 @@ class SpotifyBrowseEndpoint {
                         const data = content.data || content.itemV2?.data || {};
                         const id = (item.uri || "").split(":").pop();
 
-                        // Try to find images in EVERY possible location
+                                                                        
                         const images = data.images?.items?.flatMap((i: any) => i.sources)
                             ?? data.images?.sources
                             ?? data.coverArt?.sources
@@ -164,7 +164,7 @@ class SpotifyBrowseEndpoint {
                             ?? data.itemV2?.data?.images?.items?.flatMap((i: any) => i.sources)
                             ?? [];
 
-                        // Try to find name/title in EVERY possible location
+                                                                            
                         const name = data.name
                             || data.profile?.name
                             || data.title?.transformedLabel
@@ -176,7 +176,7 @@ class SpotifyBrowseEndpoint {
                             || content.title?.text
                             || content.metadata?.name;
 
-                        // STRICT FILTER: If we can't find a name or image, skip it entirely
+                                                                                            
                         if (!name || name === "Unknown" || images.length === 0) {
                             return null;
                         }

@@ -53,10 +53,10 @@ export class SpotifyLibraryEndpoint {
                 const uri = trackWrapper._uri || track.uri || track._uri || "";
                 const id = uri ? uri.split(":").pop() : (track.id || track.trackId || "");
 
-                // Name
+                       
                 const name = track.name || track.title || "";
 
-                // Album: new structure uses "albumOfTrack", legacy uses "album"
+                                                                                
                 const albumData = track.albumOfTrack || track.album?.data || track.album || {};
                 const albumImages = albumData?.coverArt?.sources
                     || albumData?.images?.items?.flatMap((i: any) => i.sources)

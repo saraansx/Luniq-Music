@@ -155,7 +155,7 @@ const TrackView: React.FC<TrackViewProps> = ({
         ? artistsData.map((a: any) => ({ name: a.profile?.name || '', id: a.uri?.split(':').pop() || '' }))
         : (trackArtists || []).map(name => ({ name, id: '' }));
     
-    // For passing to track objects (needs string array)
+                                                        
     const artistNames = artistObjects.map((a: any) => a.name).filter(Boolean);
 
     const albumType = trackData?.albumOfTrack?.albumType
@@ -214,7 +214,7 @@ const TrackView: React.FC<TrackViewProps> = ({
             }
             if (success) {
                 setMenuFavoriteState(!isLiked);
-                // Dispatch event to update other components (Sidebar)
+                                                                      
                 window.dispatchEvent(new Event('lune:playlist-update'));
             }
         } catch (e) {
@@ -225,18 +225,18 @@ const TrackView: React.FC<TrackViewProps> = ({
     const handleMenuClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!showMenu) {
-            // Check favorite status before opening
+                                                   
             const liked = await window.ipcRenderer.invoke('check-local-favorite', trackId);
             setMenuFavoriteState(liked);
             
             const isDownloaded = await window.ipcRenderer.invoke('check-is-downloaded', trackId);
             setMenuDownloadState(isDownloaded);
 
-            // Load local playlists
+                                   
             const playlists = await window.ipcRenderer.invoke('get-playlists');
             setLocalPlaylists(playlists);
 
-            // Check which playlists this track is in
+                                                     
             const inPlaylists = await window.ipcRenderer.invoke('get-track-playlists', trackId);
             setTrackPlaylists(inPlaylists);
         } else {
@@ -285,7 +285,7 @@ const TrackView: React.FC<TrackViewProps> = ({
             }
             if (success) {
                 window.dispatchEvent(new Event('lune:playlist-tracks-update'));
-                // Update local state without closing menu
+                                                          
                 const updatedPlaylists = await window.ipcRenderer.invoke('get-track-playlists', trackId);
                 setTrackPlaylists(updatedPlaylists);
             }

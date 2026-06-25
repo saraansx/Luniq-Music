@@ -47,7 +47,7 @@ export const fetchLyrics = async (
   albumName?: string,
   videoId?: string,
 ): Promise<LyricData | null> => {
-  // 1. Clean track name of video tags and suffixes
+                                                   
   const cleanTrackName = trackName
     .replace(/\(feat\..*?\)/gi, "")
     .replace(/\(with.*?\)/gi, "")
@@ -78,12 +78,12 @@ export const fetchLyrics = async (
     .replace(/\s+/g, " ")
     .trim();
 
-  // 2. Primary artist extraction
+                                 
   const primaryArtist = artistName.split(",")[0].split("&")[0].trim();
 
   const cacheKey = `lune_lyrics_${cleanTrackName.toLowerCase()}_${primaryArtist.toLowerCase()}`;
 
-  // Try reading cache first
+                            
   try {
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
@@ -118,7 +118,7 @@ export const fetchLyrics = async (
   }
 
   try {
-    // Primary: Spotify (Native WAF Bypass)
+                                           
     console.log(
       `[Lyrics] Trying Native Spotify for: ${cleanTrackName} by ${primaryArtist}`,
     );

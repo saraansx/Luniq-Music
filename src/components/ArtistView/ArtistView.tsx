@@ -249,7 +249,7 @@ const ArtistView: React.FC<ArtistViewProps> = ({
     const stats = artistData?.stats;
     const monthlyListeners = stats?.monthlyListeners || 0;
 
-    // Discography - Top Tracks
+                               
     const topTracksData = artistData?.discography?.topTracks?.items || [];
     const topTracks: LuneTrack[] = topTracksData.map((item: any) => {
         const tr = item.track || item;
@@ -260,7 +260,7 @@ const ArtistView: React.FC<ArtistViewProps> = ({
         return normalized;
     }).slice(0, 10);
 
-    // Discography - Albums & Singles
+                                     
     const albums = artistData?.discography?.albums?.items?.map((item: any) => {
         const release = item.releases?.items?.[0] || item;
         const id = (release.id || release.uri?.split(':').pop());
@@ -304,7 +304,7 @@ const ArtistView: React.FC<ArtistViewProps> = ({
         
         setIsPlayStarting(true);
         try {
-            // Start by grabbing up to 5 albums and 5 singles to build a robust catalog queue
+                                                                                             
             const releases = [...albums.slice(0, 5), ...singles.slice(0, 5)];
             let extraTracks: any[] = [];
             
@@ -322,7 +322,7 @@ const ArtistView: React.FC<ArtistViewProps> = ({
                         const tr = item.track || item;
                         if (!tr) return null;
                         const normalized = normalizeTrack(tr, lowDataMode);
-                        // Inject album info if missing (GQL tracks in albums often lack it)
+                                                                                            
                         if (!normalized.albumArt || normalized.albumArt.includes('data:image/svg')) normalized.albumArt = coverUrl;
                         return normalized;
                     }).filter((t: any): t is LuneTrack => t !== null);
@@ -331,7 +331,7 @@ const ArtistView: React.FC<ArtistViewProps> = ({
                 }
             }
 
-            // Combine top tracks with album/single tracks, filter duplicates
+                                                                             
             const allTracks = [...topTracks, ...extraTracks];
             const uniqueTracks = allTracks.filter((track, index, self) =>
                 index === self.findIndex((t: any) => t.id === track.id && track.id)
@@ -343,7 +343,7 @@ const ArtistView: React.FC<ArtistViewProps> = ({
             }
         } catch (e) {
             console.error("Failed to fetch extended artist tracks:", e);
-            // Fallback to top 10
+                                 
             const first = startingTrack || topTracks[0];
             if (first) {
                 onTrackSelect(first, topTracks);
@@ -357,7 +357,7 @@ const ArtistView: React.FC<ArtistViewProps> = ({
         if (topTracks.length > 0) playFullArtistCatalog();
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                                 
     const handleTrackPlay = (track: LuneTrack, _index: number) => {
         if (onTrackSelect && track) {
             onTrackSelect(track, topTracks);

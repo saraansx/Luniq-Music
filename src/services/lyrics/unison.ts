@@ -14,7 +14,7 @@ export const fetchUnisonLyrics = async (
     try {
         let entry: any = null;
 
-        // 1. Try videoId first if available
+                                            
         if (videoId) {
             const urlById = `https://unison.boidu.dev/lyrics?v=${videoId}`;
             const resById = await fetch(urlById);
@@ -26,7 +26,7 @@ export const fetchUnisonLyrics = async (
             }
         }
 
-        // 2. Fallback to metadata search
+                                         
         if (!entry) {
             const params = new URLSearchParams();
             params.append('song', cleanTrack);

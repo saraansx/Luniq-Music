@@ -348,7 +348,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
             });
             logToSystem(`[Prefetch] ✅ Cached: "${track.name}"`);
 
-            // Prefetch lyrics in background
+                                            
             fetchLyrics(
               track.name,
               track.artist,
@@ -736,7 +736,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
 
           if (controller.signal.aborted) break;
 
-          // Delay
+                  
           if (i < tracks.length - 1) {
             await new Promise((resolve) => {
               const timeout = setTimeout(resolve, 2000);

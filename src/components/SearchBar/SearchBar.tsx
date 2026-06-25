@@ -35,7 +35,7 @@ const SearchBar = ({
     const [isSearching, setIsSearching] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     
-    // Menu state
+                 
     const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
     const [menuFavoriteState, setMenuFavoriteState] = useState<boolean | null>(null);
     const [menuDownloadState, setMenuDownloadState] = useState<boolean | null>(null);
@@ -74,7 +74,7 @@ const SearchBar = ({
                     const res = await api.search.all(query, { limit: 15, topResults: 5 });
                     setResults(res);
                     
-                    // Fetch following status for artists
+                                                         
                     if (res?.artists?.length > 0) {
                         const ids = res.artists.map((a: any) => a.id).filter(Boolean);
                         const follows = await api.user.isInLibrary(ids, { itemType: 'artist' });
@@ -149,7 +149,7 @@ const SearchBar = ({
             setActiveMenuId(null);
             setShowPlaylistSubmenu(false);
         } else {
-            // Check favorite status before opening
+                                                   
             const liked = await window.ipcRenderer.invoke('check-local-favorite', itemId);
             setMenuFavoriteState(liked);
             

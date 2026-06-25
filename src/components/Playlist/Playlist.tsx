@@ -61,7 +61,7 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
     const isDownloading = activeBulkDownloads.has(playlistId || '');
     const [isInLocalLibrary, setIsInLocalLibrary] = useState(false);
 
-    // Reset downloading status when playlist changes effect removed because state is now global
+                                                                                                
     const containerRef = useRef<HTMLDivElement | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const [scrollParent, setScrollParent] = useState<HTMLElement | null>(null);
@@ -84,7 +84,7 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
                 if (type === 'playlist' || type === 'album') {
                     onPlaylistSelect?.(id, type === 'album');
                 } else if (type === 'artist') {
-                    onArtistSelect?.(id, ''); // ID is known from link
+                    onArtistSelect?.(id, '');                         
                 }
             }
         }
@@ -95,9 +95,9 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
         const fetchData = async () => {
             try {
                 setLoading(true);
-                setArtistAlbums([]); // Clear previous artist albums immediately
+                setArtistAlbums([]);                                            
 
-                // Handle local playlists
+                                         
                 if (playlistId.startsWith('local-')) {
                     if (playlistId === 'local-favorites') {
                         try {
@@ -273,7 +273,7 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
                     }
                 }
 
-                // Step 2: Try album (always runs if playlist didn't succeed)
+                                                                             
                 if (!success) {
                     try {
                         console.log("[Playlist] Attempting album fetch for ID:", playlistId);
@@ -1137,7 +1137,7 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
                         artwork: playlist.coverUrl || null,
                     }}
                     onCreate={async (updated) => {
-                        // Update Database
+                                          
                         try {
                             await window.ipcRenderer.invoke('update-playlist', {
                                 id: playlistId,

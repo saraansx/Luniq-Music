@@ -11,12 +11,12 @@ export class SpotifyRadioEndpoint {
 
         private upgradeImageUrl(url: string): string {
         if (!url) return '';
-        // Convert Spotify internal image URI → HTTPS CDN URL
+                                                             
         if (url.startsWith('spotify:image:')) {
             const hash = url.replace('spotify:image:', '');
             return `https://i.scdn.co/image/${hash}`;
         }
-        // Upgrade existing HTTPS scdn.co URLs to larger size
+                                                             
         if (url.includes('i.scdn.co')) {
             return url.replace(/ab67616d[0-9a-f]{16}/i, 'ab67616d0000b273');
         }

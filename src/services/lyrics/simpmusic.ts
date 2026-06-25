@@ -39,7 +39,7 @@ export const fetchSimpMusicLyrics = async (
         }
 
         const synced = bestMatch.syncedLyrics || "";
-        const plain = bestMatch.plainLyric || ""; // SimpMusic API uses "plainLyric" in JSON
+        const plain = bestMatch.plainLyric || "";                                           
 
         if (!synced && !plain) return null;
 

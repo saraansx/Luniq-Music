@@ -24,10 +24,10 @@ export const resolveSpotifyImageUrl = (url: string): string => {
     return url;
 };
 
-/**
- * Normalizes various track object shapes from Spotify API and local database
- * into a single consistent LuneTrack interface.
- */
+   
+                                                                             
+                                                
+   
 export const normalizeTrack = (track: any, lowDataMode: boolean = false): LuneTrack => {
     if (!track) {
         return {
@@ -43,7 +43,7 @@ export const normalizeTrack = (track: any, lowDataMode: boolean = false): LuneTr
     
     const id = track.id || track.trackId || (track.uri?.startsWith('spotify:track:') ? track.uri.split(':').pop() : track.uri) || '';
 
-    // 2. Handle Name
+                     
     const name = track.name || track.trackName || 'Unknown Track';
 
     
@@ -99,14 +99,14 @@ export const normalizeTrack = (track: any, lowDataMode: boolean = false): LuneTr
         || track.albumOfTrack?.name 
         || '';
 
-    // 6. Handle Duration
+                         
     const durationMs = track.durationMs 
         || track.duration_ms 
         || track.duration?.totalMilliseconds 
         || track.trackDuration?.totalMilliseconds 
         || 0;
 
-    // 7. Handle AddedAt / DownloadedAt
+                                       
     const addedAt = track.addedAt?.isoString || track.added_at || track.addedAt || '';
     const downloadedAt = track.downloadedAt || '';
 
