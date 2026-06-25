@@ -19,6 +19,8 @@ const QueueView: React.FC<{ onClose: () => void; onArtistSelect?: (id: string | 
         queue,
         currentTrack,
         history,
+        autoplayQueue,
+        isRadioLoading,
         handleTrackSelect: onTrackSelect,
         clearQueue,
         clearHistory: onClearHistory,
@@ -249,6 +251,34 @@ const QueueView: React.FC<{ onClose: () => void; onArtistSelect?: (id: string | 
                         {queue.length > 0 && (
                             <div className="queue-footer">
                                 <button className="clear-queue-btn" onClick={onClearQueue}>{t('queue.clearQueue')}</button>
+                            </div>
+                        )}
+
+                        {autoplayQueue.length > 0 && (
+                            <div className="queue-section autoplay-section">
+                                <div className="autoplay-divider">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ opacity: 0.5 }}>
+                                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-1-5h2v2h-2zm0-8h2v6h-2z"/>
+                                    </svg>
+                                    <h3 className="section-title" style={{ margin: 0 }}>Next in Autoplay</h3>
+                                    {isRadioLoading && (
+                                        <span className="autoplay-loading-dot" />
+                                    )}
+                                </div>
+                                {autoplayQueue.map((track, index) => (
+                                    <div
+                                        key={`autoplay-${track.id}-${index}`}
+                                        className="queue-item autoplay-item"
+                                        onClick={() => onTrackSelect(track)}
+                                    >
+                                        <img src={track.albumArt || ALBUM_PLACEHOLDER} alt="" className="queue-track-art" loading="lazy" />
+                                        <div className="queue-track-info">
+                                            <span className="queue-track-name">{track.name}</span>
+                                            <span className="queue-track-artist">{track.artist}</span>
+                                        </div>
+                                        {track.durationMs > 0 && <span className="queue-track-duration">{formatDuration(track.durationMs)}</span>}
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </>
