@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Playback.css';
 import { useLanguage } from '../../context/LanguageContext';
-import { usePlayback, AudioQuality, DownloadQuality } from '../../context/PlaybackContext';
+import { usePlayback, AudioQuality, DownloadQuality, AudioEngine } from '../../context/PlaybackContext';
 
 interface DropdownProps {
     label: string;
@@ -82,6 +82,7 @@ const Playback: React.FC = () => {
     const { 
         audioQuality, setAudioQuality, 
         downloadQuality, setDownloadQuality,
+        audioEngine, setAudioEngine,
         autoplayEnabled, setAutoplayEnabled,
         normalizeVolume, setNormalizeVolume,
         lowDataMode, setLowDataMode,
@@ -128,6 +129,11 @@ const Playback: React.FC = () => {
         { value: '256', label: `256 ${t('playback.kbps')}` },
         { value: '320', label: `320 ${t('playback.kbps')}` }
     ];
+
+    const AUDIO_ENGINES: { value: AudioEngine; label: string }[] = [
+        { value: 'youtubei', label: t('playback.engineYoutubei') },
+        { value: 'ytdlp', label: t('playback.engineYtdlp') }
+    ];
     
     const DOWNLOAD_QUALITIES: { value: DownloadQuality; label: string }[] = [
         { value: '96', label: `96 ${t('playback.kbps')}` },
@@ -154,6 +160,14 @@ const Playback: React.FC = () => {
             </div>
 
             <div className="language-content">
+                <CustomDropdown 
+                    label={t('playback.audioEngine')}
+                    subLabel={t('playback.audioEngineSub')}
+                    options={AUDIO_ENGINES}
+                    value={audioEngine}
+                    onChange={(val) => setAudioEngine(val as AudioEngine)}
+                />
+
                 <CustomDropdown 
                     label={t('playback.audioQuality')}
                     subLabel={t('playback.audioQualitySub')}

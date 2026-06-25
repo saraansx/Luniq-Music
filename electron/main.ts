@@ -11,7 +11,7 @@ import Store from 'electron-store';
 import { StoreSchema, schema } from './store.js';
 import { registerAllHandlers } from './handlers/index.js';
 import { clearRPC } from './handlers/rpc.js';
-import { ytDlp, activeSearches, activeDownloads } from './streaming.js';
+import { youtubeiAudio, ytdlpAudio, activeSearches, activeDownloads } from './streaming.js';
 import { create as createYtDlp } from 'yt-dlp-exec';
 
 const __dirname = path.dirname(nodeUrl.fileURLToPath(import.meta.url))
@@ -24,7 +24,7 @@ const ytDlpBinaryPath = isPackaged
 
 if (fs.existsSync(ytDlpBinaryPath)) {
     const customYtDlp = createYtDlp(ytDlpBinaryPath);
-    ytDlp.setYtDlpInstance(customYtDlp);
+    ytdlpAudio.setYtDlpInstance(customYtDlp);
     console.log(`[Main] Using yt-dlp binary at: ${ytDlpBinaryPath}`);
 } else {
     console.log('[Main] yt-dlp not found — will download from GitHub');
@@ -318,7 +318,8 @@ async function harvestYouTubeCookies(): Promise<boolean> {
         }
 
         await fs.promises.writeFile(ytCookiesPath, lines.join('\n'), 'utf-8');
-        ytDlp.setCookiesPath(ytCookiesPath);
+        youtubeiAudio.setCookiesPath(ytCookiesPath);
+        ytdlpAudio.setCookiesPath(ytCookiesPath);
         console.log(`[YtCookies] Harvested ${cookies.length} YouTube cookies.`);
         return true;
     } catch (err) {
@@ -388,9 +389,9 @@ app.whenReady().then(async () => {
                const arrayBuffer = await assetRes.arrayBuffer();
                await fs.promises.writeFile(ytDlpBinaryPath, Buffer.from(arrayBuffer));
                console.log(`[Main] yt-dlp downloaded/updated successfully to ${latestVersion}`);
-               const freshYtDlp = createYtDlp(ytDlpBinaryPath);
-               ytDlp.setYtDlpInstance(freshYtDlp);
-               console.log(`[Main] yt-dlp is now active at: ${ytDlpBinaryPath}`);
+                const freshYtDlp = createYtDlp(ytDlpBinaryPath);
+                ytdlpAudio.setYtDlpInstance(freshYtDlp);
+                console.log(`[Main] yt-dlp is now active at: ${ytDlpBinaryPath}`);
                if (manual) {
                    win?.webContents.send('ytdlp-update-status', { status: 'ready', isLatest: true });
                    setTimeout(() => win?.webContents.send('ytdlp-update-status', { status: 'idle' }), 5000);

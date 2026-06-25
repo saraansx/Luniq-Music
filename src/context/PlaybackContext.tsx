@@ -4,12 +4,15 @@ export type AudioQuality = '96' | '128' | '256' | '320';
 export type DownloadQuality = '96' | '128' | '256' | '320';
 export type AudioFormat = 'mp4' | 'webm';
 export type DownloadFormat = 'mp4' | 'webm';
+export type AudioEngine = 'youtubei' | 'ytdlp';
 
 interface PlaybackContextType {
   audioQuality: AudioQuality;
   setAudioQuality: (quality: AudioQuality) => void;
   downloadQuality: DownloadQuality;
   setDownloadQuality: (quality: DownloadQuality) => void;
+  audioEngine: AudioEngine;
+  setAudioEngine: (engine: AudioEngine) => void;
   audioFormat: AudioFormat;
   setAudioFormat: (format: AudioFormat) => void;
   downloadFormat: DownloadFormat;
@@ -41,6 +44,7 @@ const PlaybackContext = createContext<PlaybackContextType | undefined>(undefined
 export const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [audioQuality, setAudioQualityState] = useState<AudioQuality>('128');
   const [downloadQuality, setDownloadQualityState] = useState<DownloadQuality>('256');
+  const [audioEngine, setAudioEngineState] = useState<AudioEngine>('youtubei');
   const [audioFormat, setAudioFormatState] = useState<AudioFormat>('mp4');
   const [downloadFormat, setDownloadFormatState] = useState<DownloadFormat>('mp4');
   const [autoplayEnabled, setAutoplayEnabledState] = useState<boolean>(true);
@@ -81,6 +85,11 @@ export const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const savedDownload = await window.ipcRenderer?.invoke('get-setting', 'downloadQuality');
         if (savedDownload !== null && savedDownload !== undefined) {
           setDownloadQualityState(savedDownload);
+        }
+
+        const savedAudioEngine = await window.ipcRenderer?.invoke('get-setting', 'audioEngine');
+        if (savedAudioEngine !== null && savedAudioEngine !== undefined) {
+          setAudioEngineState(savedAudioEngine);
         }
 
         const savedAudioFormat = await window.ipcRenderer?.invoke('get-setting', 'audioFormat');
@@ -161,6 +170,12 @@ export const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     debouncedSave('downloadQuality', quality);
   };
 
+  const setAudioEngine = (engine: AudioEngine) => {
+    setAudioEngineState(engine);
+    debouncedSave('audioEngine', engine);
+    console.log(`[Audio Engine] Switched to: ${engine}`);
+  };
+
   const setAudioFormat = (format: AudioFormat) => {
     setAudioFormatState(format);
     debouncedSave('audioFormat', format);
@@ -226,6 +241,7 @@ export const PlaybackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     <PlaybackContext.Provider value={{ 
         audioQuality, setAudioQuality, 
         downloadQuality, setDownloadQuality,
+        audioEngine, setAudioEngine,
         audioFormat, setAudioFormat,
         downloadFormat, setDownloadFormat,
         autoplayEnabled, setAutoplayEnabled,

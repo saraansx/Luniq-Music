@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import * as nodeUrl from "node:url";
 import { getDatabase } from "../database.js";
-import { ytDlp, activeSearches, activeDownloads } from "../streaming.js";
+import { getAudioEngine, activeSearches, activeDownloads } from "../streaming.js";
 import { StoreSchema, schema } from "../store.js";
 import Store from "electron-store";
 
@@ -100,7 +100,7 @@ export function registerStreamingHandlers() {
             `[Main] Starting new stream fetch for: ${trackName} - ${artistName} (ID: ${trackId})`,
           );
 
-          const promise = ytDlp.getStreamUrl(
+          const promise = getAudioEngine().getStreamUrl(
             trackName,
             artistName,
             audioQuality,
@@ -172,7 +172,7 @@ export function registerStreamingHandlers() {
 
   ipcMain.handle("clear-cache", async () => {
     try {
-      await ytDlp.clearCache();
+      await getAudioEngine().clearCache();
       activeSearches.forEach((val) => val.controller.abort());
       activeSearches.clear();
 
@@ -260,7 +260,7 @@ export function registerStreamingHandlers() {
           `[Main] Downloading track: ${normalized.name} - ${normalized.artist} | Max Quality: ${downloadQuality} kbps | Format: ${downloadFormat}${lowDataMode ? " (Low Data Mode)" : ""}`,
         );
 
-        await ytDlp.downloadTrack(
+        await getAudioEngine().downloadTrack(
           normalized.name,
           normalized.artist,
           localPath,
