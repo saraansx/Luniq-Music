@@ -58,7 +58,6 @@ Thumbs.db
 .env
 dist
 dist-electron
-electron-builder.json
 node_modules
 ArchiveTune-main/
 core-main/

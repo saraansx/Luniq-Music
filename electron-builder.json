@@ -1,0 +1,61 @@
+{
+  "appId": "com.lune.app",
+  "productName": "Lune",
+  "compression": "maximum",
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "saraansx",
+      "repo": "Lune-Music"
+    }
+  ],
+  "asar": true,
+  "asarUnpack": [
+    "**/*.node",
+    "**/node_modules/better-sqlite3/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "src/assets/Lune.png",
+      "to": "Lune.png"
+    },
+    {
+      "from": "src/assets/thumbar",
+      "to": "thumbar"
+    }
+  ],
+  "directories": {
+    "output": "release/${version}"
+  },
+  "files": [
+    "dist",
+    "dist-electron",
+    "package.json"
+  ],
+  "win": {
+    "icon": "src/assets/Lune.png",
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ]
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowElevation": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false,
+    "uninstallDisplayName": "Lune",
+    "include": "build/installer.nsh",
+    "license": "LicENSE",
+    "shortcutName": "Lune",
+    "runAfterFinish": false,
+    "createDesktopShortcut": false,
+    "createStartMenuShortcut": true,
+    "artifactName": "${productName}-Setup-${version}.${ext}"
+  }
+}
