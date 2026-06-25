@@ -70,6 +70,18 @@ function calculateCacheExpiry(url: string): number {
   return Date.now() + DEFAULT_CACHE_TTL_MS;
 }
 
+function extractCodec(mimeType: string): string {
+  const match = (mimeType || "").match(/codecs="([^"]+)"/);
+  return match ? match[1] : "";
+}
+
+function codecRank(codec: string): number {
+  const c = (codec || "").toLowerCase();
+  if (c.includes("opus")) return 3;
+  if (c.includes("mp4a")) return 2;
+  return 1;
+}
+
 function calculateScore(
   candidate: any,
   expectedTitle: string,
@@ -370,24 +382,32 @@ export class YoutubeiAudio {
             filtered = audioFormats;
           }
 
-          if (quality && quality !== "default") {
-            const targetBitrate = parseInt(quality, 10) * 1000;
-            filtered.sort((a: any, b: any) => {
+          filtered.sort((a: any, b: any) => {
+            const rankA = codecRank(extractCodec(a.mime_type));
+            const rankB = codecRank(extractCodec(b.mime_type));
+            if (rankA !== rankB) return rankB - rankA;
+
+            if (quality && quality !== "default") {
+              const targetBitrate = parseInt(quality, 10) * 1000;
               const bitrateA = a.average_bitrate || a.bitrate || 128000;
               const bitrateB = b.average_bitrate || b.bitrate || 128000;
               return (
                 Math.abs(bitrateA - targetBitrate) -
                 Math.abs(bitrateB - targetBitrate)
               );
-            });
-            format = filtered[0];
-          } else {
-            filtered.sort((a: any, b: any) => {
-              const bitrateA = a.average_bitrate || a.bitrate || 0;
-              const bitrateB = b.average_bitrate || b.bitrate || 0;
-              return bitrateB - bitrateA;
-            });
-            format = filtered[0];
+            }
+
+            const bitrateA = a.average_bitrate || a.bitrate || 0;
+            const bitrateB = b.average_bitrate || b.bitrate || 0;
+            return bitrateB - bitrateA;
+          });
+          format = filtered[0];
+
+          if (format) {
+            const selectedCodec = extractCodec(format.mime_type);
+            console.log(
+              `[Youtubei] Selected format: ${format.mime_type}, codec: ${selectedCodec || "unknown"}`,
+            );
           }
         }
       } catch (err) {
@@ -495,25 +515,26 @@ export class YoutubeiAudio {
             filtered = audioFormats;
           }
 
-          if (quality && quality !== "default") {
-            const targetBitrate = parseInt(quality, 10) * 1000;
-            filtered.sort((a: any, b: any) => {
+          filtered.sort((a: any, b: any) => {
+            const rankA = codecRank(extractCodec(a.mime_type));
+            const rankB = codecRank(extractCodec(b.mime_type));
+            if (rankA !== rankB) return rankB - rankA;
+
+            if (quality && quality !== "default") {
+              const targetBitrate = parseInt(quality, 10) * 1000;
               const bitrateA = a.average_bitrate || a.bitrate || 128000;
               const bitrateB = b.average_bitrate || b.bitrate || 128000;
               return (
                 Math.abs(bitrateA - targetBitrate) -
                 Math.abs(bitrateB - targetBitrate)
               );
-            });
-            format = filtered[0];
-          } else {
-            filtered.sort((a: any, b: any) => {
-              const bitrateA = a.average_bitrate || a.bitrate || 0;
-              const bitrateB = b.average_bitrate || b.bitrate || 0;
-              return bitrateB - bitrateA;
-            });
-            format = filtered[0];
-          }
+            }
+
+            const bitrateA = a.average_bitrate || a.bitrate || 0;
+            const bitrateB = b.average_bitrate || b.bitrate || 0;
+            return bitrateB - bitrateA;
+          });
+          format = filtered[0];
         }
       } catch (err) {
         console.warn(

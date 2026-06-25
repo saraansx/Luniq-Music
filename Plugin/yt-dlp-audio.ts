@@ -72,7 +72,7 @@ export class YtDlpAudio {
         
         
         
-        let formatStr = 'bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio/best';
+        let formatStr = 'bestaudio[ext=webm][acodec*=opus]/bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio/best';
         let extFilter = '';
         
         if (formatExt === 'mp4' || formatExt === 'm4a') extFilter = '[ext=m4a]';
