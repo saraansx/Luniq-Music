@@ -22,6 +22,7 @@ All notable changes to Lune will be documented in this file.
 - **One-Retry Guard:** A per-track retry guard prevents infinite error loops — if recovery fails once, the track is skipped.
 - **Stream URL HEAD Validation:** Before returning a stream URL, the main process sends a `HEAD` request to verify it responds with 2xx. If it returns 403/404/410, the URL is rejected and the next engine/client is tried.
 - **Per-Track Cache Invalidation:** New `invalidate-stream-cache` IPC handler clears the cached stream URL for a specific track across both audio engines.
+- **Opus Codec Preference:** Both audio engines now prefer Opus audio inside WEBM containers and only fall back to AAC/MP4 if Opus is unavailable, matching ArchiveTune's codec ranking.
 - **Autoplay Queue UI:** Queue panel now shows a dedicated "Next in Autoplay" section below the regular queue (Spotify-style), with a live loading indicator while the radio pool is being filled.
 
 ### Bug Fixes & Code Cleanup

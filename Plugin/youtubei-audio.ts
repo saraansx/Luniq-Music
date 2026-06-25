@@ -70,6 +70,21 @@ function calculateCacheExpiry(url: string): number {
   return Date.now() + DEFAULT_CACHE_TTL_MS;
 }
 
+function extractCodec(mimeType: string): string {
+  try {
+    const match = mimeType.match(/codecs="([^"]+)"/);
+    return match ? match[1].toLowerCase() : "";
+  } catch {
+    return "";
+  }
+}
+
+function codecRank(codec: string): number {
+  if (codec.includes("opus")) return 3;
+  if (codec.includes("mp4a")) return 2;
+  return 1;
+}
+
 function calculateScore(
   candidate: any,
   expectedTitle: string,
@@ -373,6 +388,10 @@ export class YoutubeiAudio {
           if (quality && quality !== "default") {
             const targetBitrate = parseInt(quality, 10) * 1000;
             filtered.sort((a: any, b: any) => {
+              const rankA = codecRank(extractCodec(a.mime_type || ""));
+              const rankB = codecRank(extractCodec(b.mime_type || ""));
+              if (rankA !== rankB) return rankB - rankA;
+
               const bitrateA = a.average_bitrate || a.bitrate || 128000;
               const bitrateB = b.average_bitrate || b.bitrate || 128000;
               return (
@@ -383,6 +402,10 @@ export class YoutubeiAudio {
             format = filtered[0];
           } else {
             filtered.sort((a: any, b: any) => {
+              const rankA = codecRank(extractCodec(a.mime_type || ""));
+              const rankB = codecRank(extractCodec(b.mime_type || ""));
+              if (rankA !== rankB) return rankB - rankA;
+
               const bitrateA = a.average_bitrate || a.bitrate || 0;
               const bitrateB = b.average_bitrate || b.bitrate || 0;
               return bitrateB - bitrateA;
@@ -498,6 +521,10 @@ export class YoutubeiAudio {
           if (quality && quality !== "default") {
             const targetBitrate = parseInt(quality, 10) * 1000;
             filtered.sort((a: any, b: any) => {
+              const rankA = codecRank(extractCodec(a.mime_type || ""));
+              const rankB = codecRank(extractCodec(b.mime_type || ""));
+              if (rankA !== rankB) return rankB - rankA;
+
               const bitrateA = a.average_bitrate || a.bitrate || 128000;
               const bitrateB = b.average_bitrate || b.bitrate || 128000;
               return (
@@ -508,6 +535,10 @@ export class YoutubeiAudio {
             format = filtered[0];
           } else {
             filtered.sort((a: any, b: any) => {
+              const rankA = codecRank(extractCodec(a.mime_type || ""));
+              const rankB = codecRank(extractCodec(b.mime_type || ""));
+              if (rankA !== rankB) return rankB - rankA;
+
               const bitrateA = a.average_bitrate || a.bitrate || 0;
               const bitrateB = b.average_bitrate || b.bitrate || 0;
               return bitrateB - bitrateA;

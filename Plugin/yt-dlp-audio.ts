@@ -72,18 +72,22 @@ export class YtDlpAudio {
         
         
         
-        let formatStr = 'bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio/best';
+        let formatStr = 'bestaudio[ext=webm][acodec*=opus]/bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio/best';
         let extFilter = '';
-        
-        if (formatExt === 'mp4' || formatExt === 'm4a') extFilter = '[ext=m4a]';
-        else if (formatExt === 'webm') extFilter = '[ext=webm]';
+        let codecFilter = '';
+
+        if (formatExt === 'mp4' || formatExt === 'm4a') {
+            extFilter = '[ext=m4a]';
+        } else if (formatExt === 'webm') {
+            extFilter = '[ext=webm]';
+            codecFilter = '[acodec*=opus]';
+        }
 
         if (quality) {
-            
             const q = parseInt(quality, 10);
-            formatStr = `bestaudio${extFilter}[abr<=${q}]/bestaudio${extFilter}/bestaudio/best`;
+            formatStr = `bestaudio${extFilter}${codecFilter}[abr<=${q}]/bestaudio${extFilter}[abr<=${q}]/bestaudio[ext=m4a][abr<=${q}]/bestaudio/best`;
         } else if (extFilter) {
-            formatStr = `bestaudio${extFilter}/bestaudio/best`;
+            formatStr = `bestaudio${extFilter}${codecFilter}/bestaudio${extFilter}/bestaudio/best`;
         }
 
         const opts: Record<string, any> = {
