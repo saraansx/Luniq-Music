@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import * as nodeUrl from "node:url";
 import { getDatabase } from "../database.js";
-import { getAudioEngine, activeSearches, activeDownloads } from "../streaming.js";
+import { getAudioEngine, getFallbackEngine, activeSearches, activeDownloads } from "../streaming.js";
 import { StoreSchema, schema } from "../store.js";
 import Store from "electron-store";
 
@@ -56,6 +56,88 @@ export function registerStreamingHandlers() {
     return defaultDir;
   };
 
+  const getStreamUrlWithFallback = async (
+    trackName: string,
+    artistName: string,
+    audioQuality: string,
+    audioFormat: string,
+    signal: AbortSignal,
+    isPriority: boolean,
+    durationMs: number,
+  ): Promise<string> => {
+    const primary = getAudioEngine();
+    const fallback = getFallbackEngine();
+
+    try {
+      return await primary.getStreamUrl(
+        trackName,
+        artistName,
+        audioQuality,
+        audioFormat,
+        signal,
+        isPriority,
+        durationMs,
+      );
+    } catch (error: any) {
+      if (error.name === "AbortError" || signal.aborted) {
+        throw error;
+      }
+      console.log(
+        `[Audio Engine] Primary engine failed for "${trackName}", trying fallback...`,
+      );
+      return await fallback.getStreamUrl(
+        trackName,
+        artistName,
+        audioQuality,
+        audioFormat,
+        signal,
+        isPriority,
+        durationMs,
+      );
+    }
+  };
+
+  const downloadTrackWithFallback = async (
+    trackName: string,
+    artistName: string,
+    localPath: string,
+    downloadQuality: string,
+    downloadFormat: string,
+    onProgress: (progress: number) => void,
+    signal: AbortSignal,
+  ): Promise<string> => {
+    const primary = getAudioEngine();
+    const fallback = getFallbackEngine();
+
+    try {
+      return await primary.downloadTrack(
+        trackName,
+        artistName,
+        localPath,
+        downloadQuality,
+        downloadFormat,
+        onProgress,
+        signal,
+      );
+    } catch (error: any) {
+      if (error.name === "AbortError" || signal.aborted) {
+        throw error;
+      }
+      console.log(
+        `[Audio Engine] Primary engine failed for download "${trackName}", trying fallback...`,
+      );
+      return await fallback.downloadTrack(
+        trackName,
+        artistName,
+        localPath,
+        downloadQuality,
+        downloadFormat,
+        onProgress,
+        signal,
+      );
+    }
+  };
+
   ipcMain.handle(
     "get-stream-url",
     async (
@@ -100,7 +182,7 @@ export function registerStreamingHandlers() {
             `[Main] Starting new stream fetch for: ${trackName} - ${artistName} (ID: ${trackId})`,
           );
 
-          const promise = getAudioEngine().getStreamUrl(
+          const promise = getStreamUrlWithFallback(
             trackName,
             artistName,
             audioQuality,
@@ -260,7 +342,7 @@ export function registerStreamingHandlers() {
           `[Main] Downloading track: ${normalized.name} - ${normalized.artist} | Max Quality: ${downloadQuality} kbps | Format: ${downloadFormat}${lowDataMode ? " (Low Data Mode)" : ""}`,
         );
 
-        await getAudioEngine().downloadTrack(
+        await downloadTrackWithFallback(
           normalized.name,
           normalized.artist,
           localPath,

@@ -21,6 +21,11 @@ export function getAudioEngine(): YoutubeiAudio | YtDlpAudio {
     return engine === 'ytdlp' ? ytdlpAudio : youtubeiAudio;
 }
 
+export function getFallbackEngine(): YoutubeiAudio | YtDlpAudio {
+    const engine = store.get('audioEngine') || 'youtubei';
+    return engine === 'ytdlp' ? youtubeiAudio : ytdlpAudio;
+}
+
 export const activeSearches = new Map<string, { 
     controller: AbortController; 
     promise: Promise<string>;
