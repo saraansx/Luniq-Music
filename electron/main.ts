@@ -18,27 +18,16 @@ const __dirname = path.dirname(nodeUrl.fileURLToPath(import.meta.url))
 
 const isPackaged = app.isPackaged;
 
-let ytDlpBinaryPath = isPackaged 
+const ytDlpBinaryPath = isPackaged 
     ? path.join(app.getPath('userData'), 'yt-dlp.exe')
     : path.join(app.getAppPath(), 'node_modules', 'yt-dlp-exec', 'bin', 'yt-dlp.exe');
-
-if (isPackaged && !fs.existsSync(ytDlpBinaryPath)) {
-    const bundledYtDlp = path.join(process.resourcesPath, 'yt-dlp.exe');
-    if (fs.existsSync(bundledYtDlp)) {
-        try {
-            fs.copyFileSync(bundledYtDlp, ytDlpBinaryPath);
-            console.log(`[Main] Copied bundled yt-dlp to: ${ytDlpBinaryPath}`);
-        } catch (e) {
-            console.error('[Main] Failed to copy bundled yt-dlp:', e);
-            ytDlpBinaryPath = bundledYtDlp;
-        }
-    }
-}
 
 if (fs.existsSync(ytDlpBinaryPath)) {
     const customYtDlp = createYtDlp(ytDlpBinaryPath);
     ytDlp.setYtDlpInstance(customYtDlp);
     console.log(`[Main] Using yt-dlp binary at: ${ytDlpBinaryPath}`);
+} else {
+    console.log('[Main] yt-dlp not found — will download from GitHub');
 }
 
 import { addToLog } from './logger.js';
@@ -388,7 +377,10 @@ app.whenReady().then(async () => {
            if (assetRes.ok) {
                const arrayBuffer = await assetRes.arrayBuffer();
                await fs.promises.writeFile(ytDlpBinaryPath, Buffer.from(arrayBuffer));
-               console.log(`[Main] yt-dlp updated successfully to ${latestVersion}`);
+               console.log(`[Main] yt-dlp downloaded/updated successfully to ${latestVersion}`);
+               const freshYtDlp = createYtDlp(ytDlpBinaryPath);
+               ytDlp.setYtDlpInstance(freshYtDlp);
+               console.log(`[Main] yt-dlp is now active at: ${ytDlpBinaryPath}`);
                if (manual) {
                    win?.webContents.send('ytdlp-update-status', { status: 'ready', isLatest: true });
                    setTimeout(() => win?.webContents.send('ytdlp-update-status', { status: 'idle' }), 5000);
