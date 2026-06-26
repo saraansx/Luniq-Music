@@ -14,6 +14,7 @@ interface CacheEntry {
 const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000;
 const MAX_CACHE_SIZE = 200;
 const STREAM_URL_EXPIRY_SAFETY_MS = 60 * 1000;
+const MAX_CLIENT_MEMORY_SIZE = 100;
 
 export interface YoutubeiAudioConfig {
   useAlternativeCipher?: boolean;
@@ -120,6 +121,7 @@ export class YoutubeiAudio {
   private youtube: Innertube | null = null;
   private initPromise: Promise<Innertube> | null = null;
   private urlCache = new Map<string, CacheEntry>();
+  private lastSuccessfulClient = new Map<string, string>();
   private cookiesPath: string = "";
 
   setCookiesPath(cookiesPath: string) {
@@ -225,7 +227,7 @@ export class YoutubeiAudio {
     videoId: string,
     signal?: AbortSignal,
   ): Promise<any> {
-    const clients: Array<{ name: string; fetch: () => Promise<any> }> = [
+    const baseClients: Array<{ name: string; fetch: () => Promise<any> }> = [
       { name: "TV", fetch: () => yt.getInfo(videoId, { client: "TV" as any }) },
       { name: "IOS", fetch: () => yt.getInfo(videoId, { client: "IOS" as any }) },
       { name: "IOS_MUSIC", fetch: () => yt.getInfo(videoId, { client: "IOS_MUSIC" as any }) },
@@ -238,8 +240,22 @@ export class YoutubeiAudio {
       { name: "DEFAULT", fetch: () => yt.getInfo(videoId) },
     ];
 
+    const remembered = this.lastSuccessfulClient.get(videoId);
+    let clients = baseClients;
+    if (remembered) {
+      const rememberedClient = baseClients.find((c) => c.name === remembered);
+      if (rememberedClient) {
+        clients = [
+          rememberedClient,
+          ...baseClients.filter((c) => c.name !== remembered),
+        ];
+        console.log(`[Youtubei] Remembered ${remembered} worked for ${videoId}, trying it first`);
+      }
+    }
+
     let videoInfo;
     let lastError: any = null;
+    let successfulClient: string | null = null;
     for (const client of clients) {
       if (signal?.aborted) {
         throw Object.assign(new Error("AbortError"), { name: "AbortError" });
@@ -247,7 +263,10 @@ export class YoutubeiAudio {
       try {
         console.log(`[Youtubei] Fetching video info with ${client.name} client for ID: ${videoId}`);
         videoInfo = await client.fetch();
-        if (videoInfo) break;
+        if (videoInfo) {
+          successfulClient = client.name;
+          break;
+        }
       } catch (err) {
         lastError = err;
         console.warn(`[Youtubei] ${client.name} failed:`, err);
@@ -256,6 +275,18 @@ export class YoutubeiAudio {
 
     if (!videoInfo) {
       throw lastError || new Error("All YouTube clients failed to fetch video info");
+    }
+
+    if (successfulClient) {
+      const previous = this.lastSuccessfulClient.get(videoId);
+      if (previous !== successfulClient) {
+        if (this.lastSuccessfulClient.size >= MAX_CLIENT_MEMORY_SIZE) {
+          const firstKey = this.lastSuccessfulClient.keys().next().value;
+          if (firstKey) this.lastSuccessfulClient.delete(firstKey);
+        }
+        this.lastSuccessfulClient.set(videoId, successfulClient);
+        console.log(`[Youtubei] Remembering ${successfulClient} as successful client for ${videoId}`);
+      }
     }
 
     return videoInfo;
@@ -606,7 +637,8 @@ export class YoutubeiAudio {
 
   async clearCache(): Promise<void> {
     this.urlCache.clear();
-    console.log("[Youtubei] URL Cache cleared");
+    this.lastSuccessfulClient.clear();
+    console.log("[Youtubei] URL Cache and client memory cleared");
   }
 
   async update(): Promise<string> {
