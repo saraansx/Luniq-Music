@@ -14,7 +14,23 @@ interface CacheEntry {
 const DEFAULT_CACHE_TTL_MS = 5 * 60 * 1000;
 const MAX_CACHE_SIZE = 200;
 const STREAM_URL_EXPIRY_SAFETY_MS = 60 * 1000;
-const MAX_CLIENT_MEMORY_SIZE = 100;
+
+const STREAM_CLIENTS = [
+  "TV",
+  "TV_EMBEDDED",
+  "IOS",
+  "ANDROID_VR",
+  "ANDROID",
+  "WEB_REMIX",
+  "WEB",
+  "WEB_EMBEDDED",
+  "WEB_CREATOR",
+  "MWEB",
+  "YTMUSIC_ANDROID",
+  "DEFAULT",
+] as const;
+
+type StreamClient = (typeof STREAM_CLIENTS)[number];
 
 export interface YoutubeiAudioConfig {
   useAlternativeCipher?: boolean;
@@ -121,7 +137,6 @@ export class YoutubeiAudio {
   private youtube: Innertube | null = null;
   private initPromise: Promise<Innertube> | null = null;
   private urlCache = new Map<string, CacheEntry>();
-  private lastSuccessfulClient = new Map<string, string>();
   private cookiesPath: string = "";
 
   setCookiesPath(cookiesPath: string) {
@@ -168,7 +183,7 @@ export class YoutubeiAudio {
         this.youtube = instance;
         return instance;
       })
-      .catch((err) => {
+      .catch((err: any) => {
         this.initPromise = null;
         console.error("[Youtubei] Failed to initialize Innertube:", err);
         throw err;
@@ -222,74 +237,142 @@ export class YoutubeiAudio {
     });
   }
 
-  private async fetchVideoInfoWithFallback(
+  private getInfoWithClient(
     yt: Innertube,
     videoId: string,
-    signal?: AbortSignal,
+    client: StreamClient,
   ): Promise<any> {
-    const baseClients: Array<{ name: string; fetch: () => Promise<any> }> = [
-      { name: "TV", fetch: () => yt.getInfo(videoId, { client: "TV" as any }) },
-      { name: "IOS", fetch: () => yt.getInfo(videoId, { client: "IOS" as any }) },
-      { name: "IOS_MUSIC", fetch: () => yt.getInfo(videoId, { client: "IOS_MUSIC" as any }) },
-      { name: "ANDROID", fetch: () => yt.getInfo(videoId, { client: "ANDROID" as any }) },
-      { name: "ANDROID_MUSIC", fetch: () => yt.getInfo(videoId, { client: "ANDROID_MUSIC" as any }) },
-      { name: "ANDROID_VR", fetch: () => yt.getInfo(videoId, { client: "ANDROID_VR" as any }) },
-      { name: "TVHTML5", fetch: () => yt.getInfo(videoId, { client: "TVHTML5" as any }) },
-      { name: "WEB_REMIX", fetch: () => yt.music.getInfo(videoId) },
-      { name: "WEB", fetch: () => yt.getInfo(videoId, { client: "WEB" as any }) },
-      { name: "DEFAULT", fetch: () => yt.getInfo(videoId) },
-    ];
-
-    const remembered = this.lastSuccessfulClient.get(videoId);
-    let clients = baseClients;
-    if (remembered) {
-      const rememberedClient = baseClients.find((c) => c.name === remembered);
-      if (rememberedClient) {
-        clients = [
-          rememberedClient,
-          ...baseClients.filter((c) => c.name !== remembered),
-        ];
-        console.log(`[Youtubei] Remembered ${remembered} worked for ${videoId}, trying it first`);
-      }
+    switch (client) {
+      case "WEB_REMIX":
+        return yt.music.getInfo(videoId);
+      case "DEFAULT":
+        return yt.getInfo(videoId);
+      default:
+        return yt.getInfo(videoId, { client: client as any });
     }
+  }
 
-    let videoInfo;
+  private selectAudioFormat(
+    videoInfo: any,
+    quality?: string,
+    formatExt?: string,
+  ): any {
+    try {
+      const adaptiveFormats = videoInfo.streaming_data?.adaptive_formats || [];
+      const audioFormats = adaptiveFormats.filter(
+        (f: any) => f.has_audio && !f.has_video,
+      );
+
+      if (!audioFormats || audioFormats.length === 0) {
+        return videoInfo.chooseFormat({ type: "audio", quality: "best" });
+      }
+
+      let filtered = audioFormats;
+      if (formatExt && formatExt !== "any" && formatExt !== "default") {
+        filtered = audioFormats.filter((f: any) => {
+          const mime = (f.mime_type || "").toLowerCase();
+          return mime.includes(formatExt.toLowerCase());
+        });
+      }
+      if (filtered.length === 0) {
+        filtered = audioFormats;
+      }
+
+      filtered.sort((a: any, b: any) => {
+        const rankA = codecRank(extractCodec(a.mime_type));
+        const rankB = codecRank(extractCodec(b.mime_type));
+        if (rankA !== rankB) return rankB - rankA;
+
+        if (quality && quality !== "default") {
+          const targetBitrate = parseInt(quality, 10) * 1000;
+          const bitrateA = a.average_bitrate || a.bitrate || 128000;
+          const bitrateB = b.average_bitrate || b.bitrate || 128000;
+          return (
+            Math.abs(bitrateA - targetBitrate) -
+            Math.abs(bitrateB - targetBitrate)
+          ); 
+        }
+
+        const bitrateA = a.average_bitrate || a.bitrate || 0;
+        const bitrateB = b.average_bitrate || b.bitrate || 0;
+        return bitrateB - bitrateA;
+      });
+
+      const format = filtered[0];
+      if (format) {
+        const selectedCodec = extractCodec(format.mime_type);
+        console.log(
+          `[Youtubei] Selected format: ${format.mime_type}, codec: ${selectedCodec || "unknown"}`,
+        );
+      }
+      return format;
+    } catch (err) {
+      console.warn(
+        "[Youtubei] Custom format selection failed, falling back to chooseFormat:",
+        err,
+      );
+      return videoInfo.chooseFormat({ type: "audio", quality: "best" });
+    }
+  }
+
+  private async fetchStreamUrlWithFallback(
+    yt: Innertube,
+    videoId: string,
+    quality?: string,
+    formatExt?: string,
+    signal?: AbortSignal,
+  ): Promise<{
+    url: string;
+    format: any;
+    videoInfo: any;
+    clientName: StreamClient;
+  }> {
     let lastError: any = null;
-    let successfulClient: string | null = null;
-    for (const client of clients) {
+
+    for (const client of STREAM_CLIENTS) {
       if (signal?.aborted) {
         throw Object.assign(new Error("AbortError"), { name: "AbortError" });
       }
+
+      let videoInfo;
       try {
-        console.log(`[Youtubei] Fetching video info with ${client.name} client for ID: ${videoId}`);
-        videoInfo = await client.fetch();
-        if (videoInfo) {
-          successfulClient = client.name;
-          break;
-        }
+        console.log(`[Youtubei] Trying stream client ${client} for ${videoId}`);
+        videoInfo = await this.getInfoWithClient(yt, videoId, client);
       } catch (err) {
         lastError = err;
-        console.warn(`[Youtubei] ${client.name} failed:`, err);
+        console.warn(`[Youtubei] Stream client ${client} getInfo failed:`, err);
+        continue;
       }
-    }
 
-    if (!videoInfo) {
-      throw lastError || new Error("All YouTube clients failed to fetch video info");
-    }
+      if (!videoInfo) continue;
 
-    if (successfulClient) {
-      const previous = this.lastSuccessfulClient.get(videoId);
-      if (previous !== successfulClient) {
-        if (this.lastSuccessfulClient.size >= MAX_CLIENT_MEMORY_SIZE) {
-          const firstKey = this.lastSuccessfulClient.keys().next().value;
-          if (firstKey) this.lastSuccessfulClient.delete(firstKey);
-        }
-        this.lastSuccessfulClient.set(videoId, successfulClient);
-        console.log(`[Youtubei] Remembering ${successfulClient} as successful client for ${videoId}`);
+      const format = this.selectAudioFormat(videoInfo, quality, formatExt);
+      if (!format) {
+        console.warn(`[Youtubei] No suitable audio format for client ${client}`);
+        continue;
       }
+
+      let url: string;
+      try {
+        url = await format.decipher(yt.session.player);
+      } catch (err) {
+        lastError = err;
+        console.warn(`[Youtubei] Stream client ${client} decipher failed:`, err);
+        continue;
+      }
+
+      if (!url) {
+        console.warn(`[Youtubei] Empty stream URL from client ${client}`);
+        continue;
+      }
+
+      console.log(
+        `[Youtubei] Resolved stream URL with client ${client}: ${url.slice(0, 100)}...`,
+      );
+      return { url, format, videoInfo, clientName: client };
     }
 
-    return videoInfo;
+    throw lastError || new Error("All YouTube stream clients failed");
   }
 
   async getStreamUrl(
@@ -388,83 +471,14 @@ export class YoutubeiAudio {
       if (signal?.aborted)
         throw Object.assign(new Error("AbortError"), { name: "AbortError" });
 
-      const videoInfo = await this.fetchVideoInfoWithFallback(yt, videoId, signal);
+      const { url } = await this.fetchStreamUrlWithFallback(
+        yt,
+        videoId,
+        quality,
+        formatExt,
+        signal,
+      );
 
-      if (signal?.aborted)
-        throw Object.assign(new Error("AbortError"), { name: "AbortError" });
-
-      let format;
-      try {
-        const adaptiveFormats =
-          videoInfo.streaming_data?.adaptive_formats || [];
-        const audioFormats = adaptiveFormats.filter(
-          (f: any) => f.has_audio && !f.has_video,
-        );
-
-        if (audioFormats && audioFormats.length > 0) {
-          let filtered = audioFormats;
-          if (formatExt && formatExt !== "any" && formatExt !== "default") {
-            filtered = audioFormats.filter((f: any) => {
-              const mime = (f.mime_type || "").toLowerCase();
-              return mime.includes(formatExt.toLowerCase());
-            });
-          }
-          if (filtered.length === 0) {
-            filtered = audioFormats;
-          }
-
-          filtered.sort((a: any, b: any) => {
-            const rankA = codecRank(extractCodec(a.mime_type));
-            const rankB = codecRank(extractCodec(b.mime_type));
-            if (rankA !== rankB) return rankB - rankA;
-
-            if (quality && quality !== "default") {
-              const targetBitrate = parseInt(quality, 10) * 1000;
-              const bitrateA = a.average_bitrate || a.bitrate || 128000;
-              const bitrateB = b.average_bitrate || b.bitrate || 128000;
-              return (
-                Math.abs(bitrateA - targetBitrate) -
-                Math.abs(bitrateB - targetBitrate)
-              );
-            }
-
-            const bitrateA = a.average_bitrate || a.bitrate || 0;
-            const bitrateB = b.average_bitrate || b.bitrate || 0;
-            return bitrateB - bitrateA;
-          });
-          format = filtered[0];
-
-          if (format) {
-            const selectedCodec = extractCodec(format.mime_type);
-            console.log(
-              `[Youtubei] Selected format: ${format.mime_type}, codec: ${selectedCodec || "unknown"}`,
-            );
-          }
-        }
-      } catch (err) {
-        console.warn(
-          "[Youtubei] Custom format selection failed, falling back to chooseFormat:",
-          err,
-        );
-      }
-
-      if (!format) {
-        format = videoInfo.chooseFormat({
-          type: "audio",
-          quality: "best",
-        });
-      }
-
-      if (!format) {
-        throw new Error("Failed to choose audio format");
-      }
-
-      const url = await format.decipher(yt.session.player);
-      if (!url) {
-        throw new Error("Stream URL is empty");
-      }
-
-      console.log(`[Youtubei] Resolved URL: ${url.slice(0, 100)}...`);
       this.setCachedUrl(cacheKey, url);
       return url;
     } catch (error: any) {
@@ -521,69 +535,13 @@ export class YoutubeiAudio {
       if (signal?.aborted)
         throw Object.assign(new Error("AbortError"), { name: "AbortError" });
 
-      const videoInfo = await this.fetchVideoInfoWithFallback(yt, videoId, signal);
-
-      if (signal?.aborted)
-        throw Object.assign(new Error("AbortError"), { name: "AbortError" });
-
-      let format;
-      try {
-        const adaptiveFormats =
-          videoInfo.streaming_data?.adaptive_formats || [];
-        const audioFormats = adaptiveFormats.filter(
-          (f: any) => f.has_audio && !f.has_video,
-        );
-
-        if (audioFormats && audioFormats.length > 0) {
-          let filtered = audioFormats;
-          if (formatExt && formatExt !== "any" && formatExt !== "default") {
-            filtered = audioFormats.filter((f: any) => {
-              const mime = (f.mime_type || "").toLowerCase();
-              return mime.includes(formatExt.toLowerCase());
-            });
-          }
-          if (filtered.length === 0) {
-            filtered = audioFormats;
-          }
-
-          filtered.sort((a: any, b: any) => {
-            const rankA = codecRank(extractCodec(a.mime_type));
-            const rankB = codecRank(extractCodec(b.mime_type));
-            if (rankA !== rankB) return rankB - rankA;
-
-            if (quality && quality !== "default") {
-              const targetBitrate = parseInt(quality, 10) * 1000;
-              const bitrateA = a.average_bitrate || a.bitrate || 128000;
-              const bitrateB = b.average_bitrate || b.bitrate || 128000;
-              return (
-                Math.abs(bitrateA - targetBitrate) -
-                Math.abs(bitrateB - targetBitrate)
-              );
-            }
-
-            const bitrateA = a.average_bitrate || a.bitrate || 0;
-            const bitrateB = b.average_bitrate || b.bitrate || 0;
-            return bitrateB - bitrateA;
-          });
-          format = filtered[0];
-        }
-      } catch (err) {
-        console.warn(
-          "[Youtubei] Custom download format selection failed:",
-          err,
-        );
-      }
-
-      if (!format) {
-        format = videoInfo.chooseFormat({
-          type: "audio",
-          quality: "best",
-        });
-      }
-
-      if (!format) throw new Error("No suitable audio format found");
-
-      await format.decipher(yt.session.player);
+      const { videoInfo, format } = await this.fetchStreamUrlWithFallback(
+        yt,
+        videoId,
+        quality,
+        formatExt,
+        signal,
+      );
 
       const contentLength = format.content_length
         ? Number(format.content_length)
@@ -637,8 +595,7 @@ export class YoutubeiAudio {
 
   async clearCache(): Promise<void> {
     this.urlCache.clear();
-    this.lastSuccessfulClient.clear();
-    console.log("[Youtubei] URL Cache and client memory cleared");
+    console.log("[Youtubei] URL Cache cleared");
   }
 
   async update(): Promise<string> {

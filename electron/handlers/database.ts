@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import fs from 'fs';
 import { getDatabase } from '../database.js';
 
-function normalizeTrackForDB(track: any) {
+export function normalizeTrackForDB(track: any) {
     const artist = Array.isArray(track.artists)
         ? track.artists.map((a: any) => typeof a === 'string' ? a : (a.name || '')).join(', ')
         : track.artist || 'Unknown Artist';

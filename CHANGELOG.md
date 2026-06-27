@@ -40,6 +40,11 @@ All notable changes to Lune will be documented in this file.
 - **Build Configuration Schema:** Suppressed false-positive IDE schema warnings in `electron-builder.json` by removing the outdated schema URL.
 - **Type Declaration Missing:** Restored Vite's client typings (`/// <reference types="vite/client" />`) in `vite-env.d.ts` to fix missing module errors for image assets in the IDE.
 
+### Security
+
+- **yt-dlp Binary Integrity Verification:** Added SHA256 verification for every `yt-dlp.exe` download. Before writing the binary to disk, the app fetches the official `SHA2-256SUMS` file from the yt-dlp GitHub release, computes the hash of the downloaded file, and rejects it if they don't match. This blocks supply chain attacks where the binary is tampered during download.
+- **Postinstall Integrity Check:** Added a postinstall script (`scripts/verify-yt-dlp.mjs`) that runs after `npm install`. It verifies the downloaded `yt-dlp.exe` against the official SHA256 checksums and automatically re-downloads the correct version if a mismatch is detected.
+
 ## [1.0.5] - 2026-06-18
 
 ### Stability & Bug Fixes

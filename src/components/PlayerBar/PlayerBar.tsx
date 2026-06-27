@@ -299,7 +299,6 @@ const PlayerBar: React.FC<{
   }, [isPlaying]);
 
   
-  const audioRefCurrent = !!audioRef.current;
   useEffect(() => {
     const applyDevice = async () => {
       if (audioRef.current && audioRef.current.setSinkId) {
@@ -314,16 +313,15 @@ const PlayerBar: React.FC<{
       }
     };
     applyDevice();
-  }, [audioDeviceId, audioRefCurrent]);
+  }, [audioDeviceId]);
 
                                                                 
-  const audioRefCurrent2 = !!audioRef.current;
   useEffect(() => {
     if (audioRef.current) {
       console.log(`[Audio] Setting playbackRate to: ${playbackSpeed}x`);
       audioRef.current.playbackRate = playbackSpeed;
     }
-  }, [playbackSpeed, audioRefCurrent2]);
+  }, [playbackSpeed]);
 
   const sessionHistoryRef = useRef(sessionHistory);
   sessionHistoryRef.current = sessionHistory;
@@ -705,10 +703,8 @@ const PlayerBar: React.FC<{
         } else if (!url && currentTrack?.id === trackId) {
           if (streamRetryCount.current < 2) {
             streamRetryCount.current += 1;
-            console.warn(
-              `[PlayerBar] Empty stream URL, retrying in 2s... (${streamRetryCount.current})`,
-            );
             await new Promise((r) => setTimeout(r, 2000));
+            return fetchStreamUrl(options);
           } else {
             console.error(
               "[PlayerBar] Failed to get URL after retries, skipping.",
@@ -724,6 +720,7 @@ const PlayerBar: React.FC<{
           if (streamRetryCount.current < 2) {
             streamRetryCount.current += 1;
             await new Promise((r) => setTimeout(r, 2000));
+            return fetchStreamUrl(options);
           } else {
             onNext();
           }
@@ -823,7 +820,7 @@ const PlayerBar: React.FC<{
     }
 
     
-  }, [currentTrack?.id, isPlaying, streamUrl, isLoading]);
+  }, [currentTrack?.id, isPlaying, streamUrl, isLoading, fetchStreamUrl]);
 
   
   useEffect(() => {
@@ -1156,7 +1153,7 @@ const PlayerBar: React.FC<{
                 .catch(() => {});
 
               setStreamUrl(null);
-              fetchStreamUrl({
+              await fetchStreamUrl({
                 forceRefresh: true,
                 preferFallback: true,
                 skipPrefetch: true,

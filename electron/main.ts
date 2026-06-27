@@ -7,6 +7,7 @@ import path from 'node:path'
 import { Readable } from 'node:stream';
 import fs from 'fs';
 import { execFile } from 'node:child_process';
+import crypto from 'node:crypto';
 import Store from 'electron-store';
 import { StoreSchema, schema } from './store.js';
 import { registerAllHandlers } from './handlers/index.js';
@@ -387,6 +388,24 @@ app.whenReady().then(async () => {
            const assetRes = await fetch(`https://github.com/yt-dlp/yt-dlp/releases/download/${latestVersion}/yt-dlp.exe`);
            if (assetRes.ok) {
                const arrayBuffer = await assetRes.arrayBuffer();
+
+               const shaRes = await fetch(`https://github.com/yt-dlp/yt-dlp/releases/download/${latestVersion}/SHA2-256SUMS`);
+               if (shaRes.ok) {
+                   const shaText = await shaRes.text();
+                   const expectedHash = shaText
+                       .split('\n')
+                       .find(line => line.trim().endsWith('yt-dlp.exe'))
+                       ?.split(/\s+/)[0]
+                       ?.toLowerCase();
+                   if (expectedHash) {
+                       const actualHash = crypto.createHash('sha256').update(Buffer.from(arrayBuffer)).digest('hex').toLowerCase();
+                       if (actualHash !== expectedHash) {
+                           throw new Error(`[Main] yt-dlp SHA256 mismatch! Expected ${expectedHash}, got ${actualHash} — download rejected`);
+                       }
+                       console.log('[Main] yt-dlp SHA256 verified against official checksums');
+                   }
+               }
+
                await fs.promises.writeFile(ytDlpBinaryPath, Buffer.from(arrayBuffer));
                console.log(`[Main] yt-dlp downloaded/updated successfully to ${latestVersion}`);
                 const freshYtDlp = createYtDlp(ytDlpBinaryPath);

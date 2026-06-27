@@ -3,38 +3,15 @@ import fs from "fs";
 import path from "path";
 import * as nodeUrl from "node:url";
 import { getDatabase } from "../database.js";
+import { normalizeTrackForDB } from "./database.js";
 import { getAudioEngine, getFallbackEngine, activeSearches, activeDownloads } from "../streaming.js";
 import { StoreSchema, schema } from "../store.js";
 import Store from "electron-store";
 
 const store = new Store<StoreSchema>({ schema: schema as any });
 
-function normalizeTrackForDB(track: any) {
-  const artist = Array.isArray(track.artists)
-    ? track.artists
-        .map((a: any) => (typeof a === "string" ? a : a.name || ""))
-        .join(", ")
-    : track.artist || "Unknown Artist";
-
-  return {
-    id: track.id || track.trackId || "unknown",
-    name: track.name || "Unknown Track",
-    artist: artist,
-    albumName: track.albumName || track.album?.name || "",
-    albumArt:
-      track.albumArt ||
-      track.albumArtFull ||
-      track.images?.[0]?.url ||
-      track.album?.images?.[0]?.url ||
-      "",
-    durationMs:
-      track.durationMs ||
-      track.duration_ms ||
-      track.duration?.totalMilliseconds ||
-      track.trackDuration?.totalMilliseconds ||
-      0,
-  };
-}
+let lastClearCache = 0;
+const CLEAR_CACHE_DEBOUNCE_MS = 2_000;
 
 export function registerStreamingHandlers() {
   const db = getDatabase();
@@ -56,30 +33,6 @@ export function registerStreamingHandlers() {
     return defaultDir;
   };
 
-  const validateStreamUrl = async (
-    url: string,
-    signal: AbortSignal,
-  ): Promise<boolean> => {
-    if (!url || url.startsWith("lune-local://")) return true;
-    try {
-      const response = await fetch(url, {
-        method: "HEAD",
-        signal,
-      });
-      if (response.status >= 200 && response.status < 300) {
-        return true;
-      }
-      console.warn(
-        `[Audio Engine] Stream URL validation failed with status ${response.status}: ${url.slice(0, 100)}...`,
-      );
-      return false;
-    } catch (err: any) {
-      if (err.name === "AbortError") return false;
-      console.warn(`[Audio Engine] Stream URL validation error:`, err.message);
-      return true;
-    }
-  };
-
   const getStreamUrlWithFallback = async (
     trackName: string,
     artistName: string,
@@ -91,13 +44,11 @@ export function registerStreamingHandlers() {
     options: {
       forceRefresh?: boolean;
       preferFallback?: boolean;
-      validateUrl?: boolean;
     } = {},
   ): Promise<string> => {
     const {
       forceRefresh = false,
       preferFallback = false,
-      validateUrl = true,
     } = options;
 
     const engines = preferFallback
@@ -128,18 +79,6 @@ export function registerStreamingHandlers() {
 
         if (!url) {
           throw new Error("Empty stream URL returned by engine");
-        }
-
-        if (validateUrl && !(await validateStreamUrl(url, signal))) {
-          if (typeof (engine as any).invalidateCachedUrl === "function") {
-            (engine as any).invalidateCachedUrl(
-              trackName,
-              artistName,
-              audioQuality,
-              "webm",
-            );
-          }
-          throw new Error(`Stream URL validation failed for ${engine.constructor.name}`);
         }
 
         return url;
@@ -247,7 +186,7 @@ export function registerStreamingHandlers() {
           const audioQuality = lowDataMode
             ? "96"
             : store.get("audioQuality") || "128";
-          const audioFormat = store.get("audioFormat") || "mp4";
+          const audioFormat = "webm";
 
           console.log(
             `[Main] Starting new stream fetch for: ${trackName} - ${artistName} (ID: ${trackId})${forceRefresh ? " [force refresh]" : ""}${preferFallback ? " [prefer fallback]" : ""}`,
@@ -261,7 +200,7 @@ export function registerStreamingHandlers() {
             controller.signal,
             isPriority,
             durationMs,
-            { forceRefresh, preferFallback, validateUrl: true },
+            { forceRefresh, preferFallback },
           );
           search = { controller, promise, requesters: new Set() };
           activeSearches.set(trackId, search);
@@ -369,6 +308,12 @@ export function registerStreamingHandlers() {
   );
 
   ipcMain.handle("clear-cache", async () => {
+    const now = Date.now();
+    if (now - lastClearCache < CLEAR_CACHE_DEBOUNCE_MS) {
+      return { success: true };
+    }
+    lastClearCache = now;
+
     try {
       await getAudioEngine().clearCache();
       activeSearches.forEach((val) => val.controller.abort());
@@ -431,8 +376,7 @@ export function registerStreamingHandlers() {
         }
       }
 
-      const downloadFormat = store.get("downloadFormat") || "mp4";
-      const ext = downloadFormat === "webm" ? "webm" : "m4a";
+      const ext = "webm";
       const fileName = `${normalized.id}.${ext}`;
       const targetDir = await getDownloadsDir();
       const localPath = path.join(targetDir, fileName);
@@ -455,7 +399,7 @@ export function registerStreamingHandlers() {
           : store.get("downloadQuality") || "256";
 
         console.log(
-          `[Main] Downloading track: ${normalized.name} - ${normalized.artist} | Max Quality: ${downloadQuality} kbps | Format: ${downloadFormat}${lowDataMode ? " (Low Data Mode)" : ""}`,
+          `[Main] Downloading track: ${normalized.name} - ${normalized.artist} | Max Quality: ${downloadQuality} kbps | Format: webm${lowDataMode ? " (Low Data Mode)" : ""}`,
         );
 
         await downloadTrackWithFallback(
@@ -463,7 +407,7 @@ export function registerStreamingHandlers() {
           normalized.artist,
           localPath,
           downloadQuality,
-          downloadFormat,
+          ext,
           (progress: number) => {
             BrowserWindow.getAllWindows().forEach((w) =>
               w.webContents.send("download-progress", {

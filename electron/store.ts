@@ -16,8 +16,6 @@ export interface StoreSchema {
     audioQuality?: string;
     downloadQuality?: string;
     audioEngine?: string;
-    audioFormat?: string;
-    downloadFormat?: string;
     downloadLocation?: string;
     normalizeVolume?: boolean;
     lowDataMode?: boolean;
@@ -57,8 +55,6 @@ export const schema = {
     audioQuality: { type: 'string', default: '256' },
     downloadQuality: { type: 'string', default: '320' },
     audioEngine: { type: 'string', default: 'youtubei' },
-    audioFormat: { type: 'string', default: 'webm' },
-    downloadFormat: { type: 'string', default: 'webm' },
     downloadLocation: { type: 'string' },
     normalizeVolume: { type: 'boolean', default: false },
     lowDataMode: { type: 'boolean', default: false },
