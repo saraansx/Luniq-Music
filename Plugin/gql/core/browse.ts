@@ -276,7 +276,7 @@ class SpotifyBrowseEndpoint {
             offset?: number;
         }
     ): Promise<GqlPage<BrowseSectionItem["items"][number]>> {
-        const hash = await getHash("Browse", "homeSection");
+        const hash = await getHash("Browse", "home");
 
         const res = await this.gqlClient
             .post("query", {

@@ -34,10 +34,9 @@ class SpotifyArtistEndpoint {
     }
 
     async unfollow(artistIds: string[]) {
-        const hash = await getHash("Library", "removeFromLibrary");
+        const hash = await getHash("Library", "addToLibrary");
 
-        const res = await this.gqlClient
-            .post("query", {
+        const res = await this.gqlClient.post("query", {
                 body: {
                     variables: {
                         uris: artistIds.map((id) => `spotify:artist:${id}`),

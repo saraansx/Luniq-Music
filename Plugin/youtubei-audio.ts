@@ -366,6 +366,15 @@ export class YoutubeiAudio {
         continue;
       }
 
+      if (!url.includes('c=')) {
+        url += (url.includes('?') ? '&' : '?') + `c=${client}`;
+      }
+      
+      const ua = yt.session?.context?.client?.userAgent;
+      if (ua && !url.includes('__lune_ua=')) {
+        url += `&__lune_ua=${encodeURIComponent(ua)}`;
+      }
+
       console.log(
         `[Youtubei] Resolved stream URL with client ${client}: ${url.slice(0, 100)}...`,
       );

@@ -2,3 +2,4 @@ release/
 dist-electron
 node_modules
 ArchiveTune-main/
+Plugin/gql/spotify_hashes.json

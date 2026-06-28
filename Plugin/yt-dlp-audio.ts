@@ -249,12 +249,15 @@ export class YtDlpAudio {
                         }
 
                         const rawOutput = await child;
-                        const url = (typeof rawOutput === 'string' ? rawOutput : (rawOutput as any).stdout || '').trim();
+                        let url = (typeof rawOutput === 'string' ? rawOutput : (rawOutput as any).stdout || '').trim();
 
                         if (!url || !url.startsWith('http')) {
                             throw new Error(`Incomplete URL from yt-dlp: ${url || '[empty]'}`);
                         }
 
+                        if (!url.includes('c=')) {
+                            url += (url.includes('?') ? '&' : '?') + 'c=MWEB';
+                        }
                         
                         this.setCachedUrl(cacheKey, url);
                         console.log(`[YtDlp] Cached URL for "${tName}" by ${aName} [${quality||'default'}] via client="${client}" (${this.urlCache.size} entries)`);

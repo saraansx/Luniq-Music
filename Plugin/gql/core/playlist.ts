@@ -88,7 +88,7 @@ class SpotifyPlaylistEndpoint {
     }
 
     async addTracks(playlistId: string, { uris, position }: { uris: string[]; position?: number }) {
-        const hash = await getHash("Playlist", "addItemsToPlaylist");
+        const hash = await getHash("Playlist", "addToPlaylist");
 
         const res = await this.gqlClient.post("query", {
             body: {
@@ -112,7 +112,7 @@ class SpotifyPlaylistEndpoint {
     }
 
     async removeTracks(playlistId: string, { uris }: { uris: string[] }) {
-        const hash = await getHash("Playlist", "removeItemsFromPlaylist");
+        const hash = await getHash("Playlist", "removeFromPlaylist");
 
         const res = await this.gqlClient.post("query", {
             body: {
@@ -157,7 +157,7 @@ class SpotifyPlaylistEndpoint {
     }
 
     async unfollow(playlistIds: string[]) {
-        const hash = await getHash("Library", "removeFromLibrary");
+        const hash = await getHash("Library", "addToLibrary");
 
         const res = await this.gqlClient.post("query", {
             body: {

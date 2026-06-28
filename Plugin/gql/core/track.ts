@@ -34,10 +34,9 @@ class SpotifyTrackEndpoint {
     }
 
     async unsave(trackIds: string[]) {
-        const hash = await getHash("Library", "removeFromLibrary");
+        const hash = await getHash("Library", "addToLibrary");
 
-        const res = await this.gqlClient
-            .post("query", {
+        const res = await this.gqlClient.post("query", {
                 body: {
                     variables: {
                         uris: trackIds.map((id) => `spotify:track:${id}`),

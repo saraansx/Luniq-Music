@@ -142,7 +142,7 @@ class SpotifyAlbumEndpoint {
 
             
             try {
-                const fallbackHash = await getHash("Album", "queryAlbumTracks");
+                const fallbackHash = await getHash("Album", "getAlbum");
 
                 const res = await this.gqlClient.post("query", {
                     body: {
@@ -173,10 +173,9 @@ class SpotifyAlbumEndpoint {
     }
 
     async unsave(albumIds: string[]) {
-        const hash = await getHash("Library", "removeFromLibrary");
+        const hash = await getHash("Library", "addToLibrary");
 
-        const res = await this.gqlClient
-            .post("query", {
+        const res = await this.gqlClient.post("query", {
                 body: {
                     variables: {
                         uris: albumIds.map((id) => `spotify:album:${id}`),

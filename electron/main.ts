@@ -610,8 +610,9 @@ app.whenReady().then(async () => {
       const isGooglevideo = details.url.includes('googlevideo.com');
       
       let clientParam = '';
+      let parsedUrl: URL | null = null;
       try {
-        const parsedUrl = new URL(details.url);
+        parsedUrl = new URL(details.url);
         clientParam = parsedUrl.searchParams.get('c') || '';
       } catch (e) {}
 
@@ -633,10 +634,22 @@ app.whenReady().then(async () => {
       let resolvedReferer: string | null = null;
       let resolvedUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-      if (isTvClient) {
+      const customUa = parsedUrl?.searchParams.get('__lune_ua');
+
+      if (customUa) {
+        resolvedUserAgent = customUa;
+        if (clientName === 'IOS') {
+          resolvedOrigin = 'https://www.youtube.com';
+          resolvedReferer = 'https://www.youtube.com/';
+        }
+      } else if (isTvClient) {
         resolvedOrigin = 'https://www.youtube.com';
         resolvedReferer = 'https://www.youtube.com/tv';
         resolvedUserAgent = 'Mozilla/5.0 (ChromiumStylePlatform) Cobalt/Version';
+      } else if (clientName === 'MWEB') {
+        resolvedOrigin = 'https://m.youtube.com';
+        resolvedReferer = 'https://m.youtube.com/';
+        resolvedUserAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1';
       } else if (isWebMusicClient || !clientName) {
         resolvedOrigin = 'https://music.youtube.com';
         resolvedReferer = 'https://music.youtube.com/';
