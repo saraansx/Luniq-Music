@@ -23,19 +23,20 @@ All notable changes to Lune will be documented in this file.
 - **Playback Error Recovery:** When a stream fails with `MEDIA_ELEMENT_ERROR`, the player now invalidates that track's cached URL, fetches a fresh URL, and automatically tries the fallback audio engine (`yt-dlp` ↔ `youtubei.js`) before skipping.
 - **One-Retry Guard:** A per-track retry guard prevents infinite error loops — if recovery fails once, the track is skipped.
 - **Stream URL HEAD Validation:** Before returning a stream URL, the main process sends a `HEAD` request to verify it responds with 2xx. If it returns 403/404/410, the URL is rejected and the next engine/client is tried.
-- **Fixed `403 Forbidden` Playback Skips:** Completely resolved an issue where YouTube streams would skip with a 403 error during playback. `youtubei.js` and `yt-dlp` now embed their exact client type and precise `User-Agent` string into the stream URLs they generate, allowing the main process interceptor to accurately spoof the exact User-Agent YouTube's `poToken` anti-bot system expects for that specific client.
-- **Fixed Radio Track Suggestions:** Replaced the broken internal `radio-apollo` GraphQL implementation with ArchiveTune's reliable REST API (`api.spotify.com/v1/recommendations`) fallback. Radio stations and infinite playback now fetch suggestions perfectly again.
 - **Per-Track Cache Invalidation:** New `invalidate-stream-cache` IPC handler clears the cached stream URL for a specific track across both audio engines.
 - **Autoplay Queue UI:** Queue panel now shows a dedicated "Next in Autoplay" section below the regular queue (Spotify-style), with a live loading indicator while the radio pool is being filled.
 
-### Bug Fixes & Code Cleanup
-
 #### Changed
+- **Login UI Polish:** Refined the "Connect with Spotify" button on the Login page. Replaced the older dark green icon with Spotify's modern lighter green (`#1ed760`) and added a subtle, soft drop-shadow for better contrast against dark backgrounds.
+- **Login Localization:** Updated the Spotify connection prompt from "Continue with Spotify" to "Connect with Spotify" across all 20 supported languages.
 - **Reliable yt-dlp Updater:** Completely rewrote the `yt-dlp` update mechanism. The app now directly queries the official GitHub API on every launch and downloads the newest binary release automatically, completely bypassing unreliable native updater commands.
 - **Cleaner Error Logging:** Silenced massive error stack traces in the console when `yt-dlp` is missing or when cache clears fail during a background download.
 - **Cache Invalidation Alignment:** `youtubei.js` and `yt-dlp` cache invalidation now targets the correct `webm` cache key, matching the engines' internal behavior.
 
 #### Fixed
+- **Fixed Taskbar Controls Display:** The Windows taskbar thumbnail controls (Play/Pause/Skip) are now properly hidden on the Login and Home pages, and will only appear when a track is actively loaded into the player.
+- **Fixed `403 Forbidden` Playback Skips:** Completely resolved an issue where YouTube streams would skip with a 403 error during playback. `youtubei.js` and `yt-dlp` now embed their exact client type and precise `User-Agent` string into the stream URLs they generate, allowing the main process interceptor to accurately spoof the exact User-Agent YouTube's `poToken` anti-bot system expects for that specific client.
+- **Fixed Radio Track Suggestions:** Replaced the broken internal `radio-apollo` GraphQL implementation with ArchiveTune's reliable REST API (`api.spotify.com/v1/recommendations`) fallback. Radio stations and infinite playback now fetch suggestions perfectly again.
 - **Autoplay Queue Persistence:** The "Next in Autoplay" pool is now saved to local storage and restored on app restart. Previously it was lost every time the app closed.
 - **Lyrics Auto-Scroll Dragging Header:** Fixed a bug where the lyrics auto-scroll would pull the album art, track name, and close button upward along with the lyrics. Replaced `scrollIntoView` (which could scroll the whole overlay) with a scoped `scrollTo` call on the lyrics content container only.
 - **yt-dlp Binary Update Failure:** Fixed a bug where `yt-dlp.exe` could not update in production builds because it was locked inside the read-only `.asar` package. The binary is now correctly migrated to the user's local `AppData` directory upon launch, granting it full permissions to overwrite itself.

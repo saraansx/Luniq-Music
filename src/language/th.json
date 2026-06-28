@@ -200,7 +200,7 @@
   "login.tagline": "เพลงของคุณ จินตนาการใหม่",
   "login.description": "แอปเพลงยุคใหม่จาก Spotify",
   "login.connecting": "กำลังเชื่อมต่อ...",
-  "login.continueWithSpotify": "ดำเนินการกับ Spotify",
+  "login.continueWithSpotify": "เชื่อมต่อกับ Spotify",
   "login.failed": "เข้าสู่ระบบล้มเหลว ลองอีกครั้ง",
   "createPlaylist.create": "สร้างเพลย์ลิสต์",
   "createPlaylist.editDetails": "แก้ไขรายละเอียด",

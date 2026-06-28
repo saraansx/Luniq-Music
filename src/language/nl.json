@@ -200,7 +200,7 @@
   "login.tagline": "jouw muziek, opnieuw bedacht",
   "login.description": "Een next-gen muziekclient op basis van Spotify.",
   "login.connecting": "Verbinden...",
-  "login.continueWithSpotify": "Doorgaan met Spotify",
+  "login.continueWithSpotify": "Verbinden met Spotify",
   "login.failed": "Inloggen mislukt. Probeer opnieuw.",
   "createPlaylist.create": "Lijst Maken",
   "createPlaylist.editDetails": "Details Bewerken",

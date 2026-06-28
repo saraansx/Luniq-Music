@@ -200,7 +200,7 @@
   "login.tagline": "your music, reimagined",
   "login.description": "A next-gen music client powered by Spotify's metadata ecosystem.",
   "login.connecting": "Connecting...",
-  "login.continueWithSpotify": "Continue with Spotify",
+  "login.continueWithSpotify": "Connect with Spotify",
   "login.failed": "Login failed. Please try again.",
   "createPlaylist.create": "Create Playlist",
   "createPlaylist.editDetails": "Edit details",

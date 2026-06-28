@@ -200,7 +200,7 @@
   "login.tagline": "आपका संगीत, पुनर्कल्पित",
   "login.description": "Spotify पर आधारित अगली पीढ़ी का क्लाइंट।",
   "login.connecting": "कनेक्ट हो रहा...",
-  "login.continueWithSpotify": "Spotify से जारी रखें",
+  "login.continueWithSpotify": "Spotify से कनेक्ट करें",
   "login.failed": "लॉगिन विफल। पुनः प्रयास करें।",
   "createPlaylist.create": "प्लेलिस्ट बनाएं",
   "createPlaylist.editDetails": "विवरण संपादित",

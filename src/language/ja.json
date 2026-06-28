@@ -200,7 +200,7 @@
   "login.tagline": "あなたの音楽、再創造",
   "login.description": "Spotifyのメタデータエコシステムを活用した次世代音楽クライアント。",
   "login.connecting": "接続中...",
-  "login.continueWithSpotify": "Spotifyで続行",
+  "login.continueWithSpotify": "Spotifyに接続",
   "login.failed": "ログインに失敗しました。もう一度お試しください。",
   "createPlaylist.create": "プレイリストを作成",
   "createPlaylist.editDetails": "詳細を編集",

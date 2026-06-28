@@ -200,7 +200,7 @@
   "login.tagline": "twoja muzyka, na nowo",
   "login.description": "Klient muzyczny nowej generacji oparty na Spotify.",
   "login.connecting": "Łączenie...",
-  "login.continueWithSpotify": "Kontynuuj przez Spotify",
+  "login.continueWithSpotify": "Połącz ze Spotify",
   "login.failed": "Logowanie nieudane. Spróbuj ponownie.",
   "createPlaylist.create": "Utwórz playlistę",
   "createPlaylist.editDetails": "Edytuj szczegóły",

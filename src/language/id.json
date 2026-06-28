@@ -200,7 +200,7 @@
   "login.tagline": "musikmu, dibayangkan ulang",
   "login.description": "Klien musik generasi baru berbasis Spotify.",
   "login.connecting": "Menghubungkan...",
-  "login.continueWithSpotify": "Lanjutkan dengan Spotify",
+  "login.continueWithSpotify": "Hubungkan dengan Spotify",
   "login.failed": "Login gagal. Coba lagi.",
   "createPlaylist.create": "Buat Playlist",
   "createPlaylist.editDetails": "Edit Detail",

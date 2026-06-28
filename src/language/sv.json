@@ -200,7 +200,7 @@
   "login.tagline": "din musik, nytänkt",
   "login.description": "En nästa generations musikklient driven av Spotify.",
   "login.connecting": "Ansluter...",
-  "login.continueWithSpotify": "Fortsätt med Spotify",
+  "login.continueWithSpotify": "Anslut till Spotify",
   "login.failed": "Inloggning misslyckades. Försök igen.",
   "createPlaylist.create": "Skapa Spellista",
   "createPlaylist.editDetails": "Redigera Detaljer",

@@ -200,7 +200,7 @@
   "login.tagline": "deine Musik, neu gedacht",
   "login.description": "Ein Musikclient der nächsten Generation, angetrieben vom Metadaten-Ökosystem von Spotify.",
   "login.connecting": "Verbinden...",
-  "login.continueWithSpotify": "Mit Spotify fortfahren",
+  "login.continueWithSpotify": "Mit Spotify verbinden",
   "login.failed": "Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
   "createPlaylist.create": "Playlist erstellen",
   "createPlaylist.editDetails": "Details bearbeiten",

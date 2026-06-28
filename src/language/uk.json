@@ -200,7 +200,7 @@
   "login.tagline": "ваша музика, переосмислена",
   "login.description": "Музичний клієнт нового покоління на базі Spotify.",
   "login.connecting": "Підключення...",
-  "login.continueWithSpotify": "Продовжити через Spotify",
+  "login.continueWithSpotify": "Підключитися через Spotify",
   "login.failed": "Вхід не вдався. Спробуйте знову.",
   "createPlaylist.create": "Створити плейлист",
   "createPlaylist.editDetails": "Редагувати",

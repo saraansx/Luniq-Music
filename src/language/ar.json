@@ -200,7 +200,7 @@
   "login.tagline": "موسيقاك، بشكل جديد",
   "login.description": "عميل موسيقي من الجيل التالي بتقنية Spotify.",
   "login.connecting": "جارٍ الاتصال...",
-  "login.continueWithSpotify": "المتابعة عبر Spotify",
+  "login.continueWithSpotify": "اتصل بـ Spotify",
   "login.failed": "فشل تسجيل الدخول. حاول مجدداً.",
   "createPlaylist.create": "إنشاء قائمة",
   "createPlaylist.editDetails": "تعديل التفاصيل",

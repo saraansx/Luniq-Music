@@ -200,7 +200,7 @@
   "login.tagline": "ваша музыка, переосмыслена",
   "login.description": "Музыкальный клиент нового поколения на базе экосистемы Spotify.",
   "login.connecting": "Подключение...",
-  "login.continueWithSpotify": "Продолжить через Spotify",
+  "login.continueWithSpotify": "Подключиться к Spotify",
   "login.failed": "Ошибка входа. Попробуйте снова.",
   "createPlaylist.create": "Создать плейлист",
   "createPlaylist.editDetails": "Редактировать",

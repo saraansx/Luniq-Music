@@ -127,7 +127,9 @@
 }
 
 .connect-btn:hover svg {
-    color: #1DB954; }
+    color: #1ed760;
+    filter: drop-shadow(0 0 6px rgba(30, 215, 96, 0.2));
+}
 
 .connect-btn:active {
     transform: scale(0.98) translateY(0);

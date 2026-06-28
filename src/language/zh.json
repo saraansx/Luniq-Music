@@ -200,7 +200,7 @@
   "login.tagline": "你的音乐，重新想象",
   "login.description": "基于Spotify元数据生态系统的下一代音乐客户端。",
   "login.connecting": "连接中...",
-  "login.continueWithSpotify": "使用Spotify继续",
+  "login.continueWithSpotify": "连接到Spotify",
   "login.failed": "登录失败。请重试。",
   "createPlaylist.create": "创建歌单",
   "createPlaylist.editDetails": "编辑详情",

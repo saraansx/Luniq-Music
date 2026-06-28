@@ -200,7 +200,7 @@
   "login.tagline": "müziğin, yeniden hayal edildi",
   "login.description": "Spotify metadata ekosistemi ile yeni nesil müzik istemcisi.",
   "login.connecting": "Bağlanıyor...",
-  "login.continueWithSpotify": "Spotify ile Devam Et",
+  "login.continueWithSpotify": "Spotify'a Bağlan",
   "login.failed": "Giriş başarısız. Tekrar deneyin.",
   "createPlaylist.create": "Liste Oluştur",
   "createPlaylist.editDetails": "Detayları Düzenle",
