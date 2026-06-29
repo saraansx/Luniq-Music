@@ -2,11 +2,125 @@ import { ipcMain, app, session, shell, BrowserWindow } from "electron";
 import fs from "fs";
 import path from "path";
 import * as nodeUrl from "node:url";
+import http from "http";
 import { getDatabase } from "../database.js";
 import { normalizeTrackForDB } from "./database.js";
 import { getAudioEngine, getFallbackEngine, activeSearches, activeDownloads } from "../streaming.js";
 import { StoreSchema, schema } from "../store.js";
 import Store from "electron-store";
+
+let proxyPort = 0;
+const proxyServer = http.createServer((req, res) => {
+  const reqUrl = req.url || '';
+  if (!reqUrl.startsWith('/stream')) {
+    res.writeHead(404);
+    res.end();
+    return;
+  }
+
+  const queryIndex = reqUrl.indexOf('?');
+  if (queryIndex === -1) {
+    res.writeHead(400);
+    res.end('Missing query');
+    return;
+  }
+
+  const queryParams = new URLSearchParams(reqUrl.slice(queryIndex));
+  const targetUrl = queryParams.get('url');
+  if (!targetUrl) {
+    res.writeHead(400);
+    res.end('Missing url');
+    return;
+  }
+
+  let resolvedUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+  try {
+    const parsed = new URL(targetUrl);
+    const uaParam = parsed.searchParams.get('__lune_ua');
+    if (uaParam) {
+      resolvedUserAgent = uaParam;
+    }
+  } catch (e) {}
+
+  let start = 0;
+  let end: number | null = null;
+  if (req.headers.range) {
+    const parts = req.headers.range.replace(/bytes=/, "").split("-");
+    start = parseInt(parts[0], 10);
+    if (parts[1]) {
+      end = parseInt(parts[1], 10);
+    }
+  }
+
+  const CHUNK_SIZE = 512 * 1024;
+  let targetEnd = end;
+  if (targetEnd === null) {
+    targetEnd = start + CHUNK_SIZE - 1;
+  }
+
+  const headers: Record<string, string> = {
+    'Range': `bytes=${start}-${targetEnd}`,
+    'User-Agent': resolvedUserAgent
+  };
+  const controller = new AbortController();
+  req.on('close', () => controller.abort());
+
+  globalThis.fetch(targetUrl, {
+    headers,
+    signal: controller.signal
+  })
+    .then((targetRes) => {
+      if (targetRes.status === 403) {
+        console.warn(`[Proxy] 403 Forbidden details:`, {
+          statusText: targetRes.statusText,
+          headers: Object.fromEntries(targetRes.headers.entries()),
+          targetUrl,
+          sentHeaders: headers
+        });
+      }
+
+      res.writeHead(targetRes.status, {
+        'Content-Type': targetRes.headers.get('content-type') || 'audio/webm',
+        'Content-Length': targetRes.headers.get('content-length') || '',
+        'Content-Range': targetRes.headers.get('content-range') || '',
+        'Accept-Ranges': 'bytes',
+        'Access-Control-Allow-Origin': '*',
+      });
+
+      if (targetRes.body) {
+        const reader = targetRes.body.getReader();
+        const pump = async () => {
+          const { done, value } = await reader.read();
+          if (done) {
+            res.end();
+            return;
+          }
+          res.write(value);
+          await pump();
+        };
+        pump().catch((err) => {
+          console.error('[Proxy] Stream piping error:', err);
+          res.end();
+        });
+      } else {
+        res.end();
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'AbortError' || err.message?.includes('aborted')) return;
+      console.error('[Proxy] Request error:', err);
+      if (!res.headersSent) {
+        res.writeHead(500);
+      }
+      res.end();
+    });
+});
+
+proxyServer.listen(0, '127.0.0.1', () => {
+  const addr = proxyServer.address();
+  proxyPort = typeof addr === 'string' ? 0 : addr?.port || 0;
+  console.log(`[Proxy] Local stream proxy running on http://127.0.0.1:${proxyPort}`);
+});
 
 const store = new Store<StoreSchema>({ schema: schema as any });
 
@@ -80,8 +194,8 @@ export function registerStreamingHandlers() {
         if (!url) {
           throw new Error("Empty stream URL returned by engine");
         }
-
-        return url;
+        const localUrl = `http://127.0.0.1:${proxyPort}/stream?url=${encodeURIComponent(url)}`;
+        return localUrl;
       } catch (error: any) {
         if (error.name === "AbortError" || signal.aborted) {
           throw error;

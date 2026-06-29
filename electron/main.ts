@@ -1,6 +1,7 @@
 import './shim.js';
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
 import { app, BrowserWindow, ipcMain, Menu, protocol, globalShortcut, session, Tray, nativeImage } from 'electron'
+app.commandLine.appendSwitch('log-level', '3');
 import { autoUpdater } from 'electron-updater'
 import * as nodeUrl from 'node:url'
 import path from 'node:path'
@@ -133,12 +134,12 @@ if (!gotTheLock) {
     },
   })
 
-  win.webContents.on('console-message', (_event, level, message, line, sourceId) => {
-    if (message.includes('Electron Security Warning')) return;
-    if (level >= 2) { 
+  win.webContents.on('console-message', (_event, details: any) => {
+    if (details.message.includes('Electron Security Warning')) return;
+    if (details.level >= 2) { 
       const levels = ['debug', 'info', 'warn', 'error'];
-      const levelStr = levels[level] || 'log';
-      console.log(`[Renderer] [${levelStr.toUpperCase()}] ${message} (${path.basename(sourceId)}:${line})`);
+      const levelStr = levels[details.level] || 'log';
+      console.log(`[Renderer] [${levelStr.toUpperCase()}] ${details.message} (${path.basename(details.sourceId)}:${details.lineNumber})`);
     }
   });
 
@@ -641,10 +642,14 @@ app.whenReady().then(async () => {
   const requestHeadersMap = new Map<number, any>();
 
   session.defaultSession.webRequest.onBeforeSendHeaders(
-    { urls: ['*://*.googlevideo.com/*', '*://*.youtube.com/*'] },
+    { urls: ['*://*.youtube.com/*'] },
     (details, callback) => {
       const requestHeaders = details.requestHeaders || {};
-      const isGooglevideo = details.url.includes('googlevideo.com');
+      
+      if (!details.webContentsId || details.webContentsId < 0) {
+        callback({ cancel: false, requestHeaders });
+        return;
+      }
       
       let clientParam = '';
       let parsedUrl: URL | null = null;
@@ -726,8 +731,6 @@ app.whenReady().then(async () => {
         requestHeaders['Cookie'] = ytCookie;
         requestHeaders['cookie'] = ytCookie;
         requestHeaders['COOKIE'] = ytCookie;
-      } else if (isGooglevideo && isWebClient && !ytCookie) {
-        console.warn(`[WebRequest] No YouTube cookies found to inject!`);
       }
 
       requestHeadersMap.set(details.id, {
@@ -742,7 +745,7 @@ app.whenReady().then(async () => {
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     const responseHeaders = details.responseHeaders || {};
     const url = details.url.toLowerCase();
-    if (url.includes('googlevideo.com') || url.includes('youtube.com') || url.includes('lrclib.net') || url.includes('boidu.dev')) {
+    if (url.includes('youtube.com') || url.includes('lrclib.net') || url.includes('boidu.dev')) {
       if (details.statusCode >= 400) {
         console.error(`[WebRequest] Error response received: status=${details.statusCode}, url=${details.url.slice(0, 120)}...`);
 

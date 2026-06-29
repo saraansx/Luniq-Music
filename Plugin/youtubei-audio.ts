@@ -16,16 +16,16 @@ const MAX_CACHE_SIZE = 200;
 const STREAM_URL_EXPIRY_SAFETY_MS = 60 * 1000;
 
 const STREAM_CLIENTS = [
+  "ANDROID_VR",
+  "MWEB",
   "TV",
   "TV_EMBEDDED",
-  "IOS",
-  "ANDROID_VR",
   "ANDROID",
   "WEB_REMIX",
+  "IOS",
   "WEB",
   "WEB_EMBEDDED",
   "WEB_CREATOR",
-  "MWEB",
   "YTMUSIC_ANDROID",
   "DEFAULT",
 ] as const;
@@ -370,14 +370,50 @@ export class YoutubeiAudio {
         url += (url.includes('?') ? '&' : '?') + `c=${client}`;
       }
       
-      const ua = yt.session?.context?.client?.userAgent;
-      if (ua && !url.includes('__lune_ua=')) {
+function getClientUserAgent(client: StreamClient): string {
+  switch (client) {
+    case "MWEB":
+      return "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1";
+    case "ANDROID":
+    case "ANDROID_VR":
+    case "YTMUSIC_ANDROID":
+      return "com.google.android.youtube/19.05.36 (Linux; U; Android 11; GMT)";
+    case "IOS":
+      return "com.google.ios.youtube/19.05.36 (iPhone14,3; U; CPU OS 15_6 like Mac OS X; gsa/10.0)";
+    case "TV":
+    case "TV_EMBEDDED":
+      return "Mozilla/5.0 (ChromiumStylePlatform) Cobalt/Version";
+    default:
+      return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+  }
+}
+
+      const ua = getClientUserAgent(client);
+      if (!url.includes('__lune_ua=')) {
         url += `&__lune_ua=${encodeURIComponent(ua)}`;
       }
 
       console.log(
         `[Youtubei] Resolved stream URL with client ${client}: ${url.slice(0, 100)}...`,
       );
+
+      try {
+        const checkRes = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Range': 'bytes=0-1',
+          }
+        });
+        if (checkRes.status !== 200 && checkRes.status !== 206) {
+          console.warn(`[Youtubei] Stream client ${client} failed verification (status ${checkRes.status}), trying next client...`);
+          continue;
+        }
+        console.log(`[Youtubei] Verification passed for client ${client} (status ${checkRes.status})`);
+      } catch (e) {
+        console.warn(`[Youtubei] Verification fetch failed for client ${client}:`, e);
+        continue;
+      }
+
       return { url, format, videoInfo, clientName: client };
     }
 
