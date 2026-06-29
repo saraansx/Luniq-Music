@@ -39,7 +39,8 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken: _accessToken, cookies, o
     const [localPlaylists, setLocalPlaylists] = useState<LocalPlaylist[]>([]);
     const [savedLibrary, setSavedLibrary] = useState<any[]>([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
-    
+    const [showAddMenu, setShowAddMenu] = useState(false);
+    const [createTarget, setCreateTarget] = useState<'local' | 'spotify'>('local');
     
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
@@ -192,15 +193,41 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken: _accessToken, cookies, o
     }, [api, cookies, activeFilter]);
 
     const handleAddClick = () => {
-        setShowCreateModal(true);
+        setShowAddMenu(prev => !prev);
     };
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            if (!target.closest('.sidebar-actions')) {
+                setShowAddMenu(false);
+            }
+        };
+        if (showAddMenu) {
+            document.addEventListener('click', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [showAddMenu]);
 
     const handleCreatePlaylist = async (playlist: { name: string; description: string; artwork: string | null }) => {
         try {
-            const newPlaylist = await window.ipcRenderer.invoke('create-playlist', playlist);
-            if (newPlaylist && newPlaylist.id) {
-                setLocalPlaylists(prev => [newPlaylist, ...prev]);
-                setShowCreateModal(false);
+            if (createTarget === 'local') {
+                const newPlaylist = await window.ipcRenderer.invoke('create-playlist', playlist);
+                if (newPlaylist && newPlaylist.id) {
+                    setLocalPlaylists(prev => [newPlaylist, ...prev]);
+                    setShowCreateModal(false);
+                }
+            } else {
+                const newPlaylist = await api.playlist.create({
+                    name: playlist.name,
+                    description: playlist.description
+                });
+                if (newPlaylist && newPlaylist.uri) {
+                    fetchLibrary(false);
+                    setShowCreateModal(false);
+                }
             }
         } catch (error) {
             console.error("Failed to create playlist:", error);
@@ -248,7 +275,7 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken: _accessToken, cookies, o
                     {!isCollapsed && <h2>{t('sidebar.yourLibrary')}</h2>}
                 </div>
                 {!isCollapsed && (
-                    <div className="sidebar-actions">
+                    <div className="sidebar-actions" style={{ position: 'relative' }}>
                         <button
                             className="add-btn"
                             title={t('sidebar.createPlaylist')}
@@ -256,6 +283,22 @@ const Sidebar: React.FC<SidebarProps> = ({ accessToken: _accessToken, cookies, o
                         >
                             <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="currentColor"><path d="M15.25 8a.75.75 0 01-.75.75H8.75v5.75a.75.75 0 01-1.5 0V8.75H1.5a.75.75 0 010-1.5h5.75V1.5a.75.75 0 011.5 0v5.75h5.75a.75.75 0 01.75.75z"></path></svg>
                         </button>
+                        {showAddMenu && (
+                            <div className="sidebar-add-menu">
+                                <button onClick={() => {
+                                    setCreateTarget('local');
+                                    setShowAddMenu(false);
+                                    setShowCreateModal(true);
+                                }}>Create local playlist</button>
+                                {isOnline && (
+                                    <button onClick={() => {
+                                        setCreateTarget('spotify');
+                                        setShowAddMenu(false);
+                                        setShowCreateModal(true);
+                                    }}>Create spotify playlist</button>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
