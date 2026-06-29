@@ -654,7 +654,7 @@ app.whenReady().then(async () => {
       } catch (e) {}
 
       const clientName = clientParam.toUpperCase().trim();
-      const isTvClient = clientName === 'TVHTML5' || clientName === 'TVHTML5_SIMPLY' || clientName === 'TVHTML5_SIMPLY_EMBEDDED_PLAYER';
+      const isTvClient = clientName === 'TV' || clientName === 'TVHTML5' || clientName === 'TVHTML5_SIMPLY' || clientName === 'TVHTML5_SIMPLY_EMBEDDED_PLAYER';
       const isWebMusicClient = clientName === 'WEB' || clientName === 'WEB_REMIX' || clientName === 'WEB_CREATOR' || clientName === 'MWEB' || clientName === 'WEB_EMBEDDED_PLAYER';
 
       delete requestHeaders['Origin'];
@@ -671,15 +671,7 @@ app.whenReady().then(async () => {
       let resolvedReferer: string | null = null;
       let resolvedUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-      const customUa = parsedUrl?.searchParams.get('__lune_ua');
-
-      if (customUa) {
-        resolvedUserAgent = customUa;
-        if (clientName === 'IOS') {
-          resolvedOrigin = 'https://www.youtube.com';
-          resolvedReferer = 'https://www.youtube.com/';
-        }
-      } else if (isTvClient) {
+      if (isTvClient) {
         resolvedOrigin = 'https://www.youtube.com';
         resolvedReferer = 'https://www.youtube.com/tv';
         resolvedUserAgent = 'Mozilla/5.0 (ChromiumStylePlatform) Cobalt/Version';
@@ -690,25 +682,27 @@ app.whenReady().then(async () => {
       } else if (isWebMusicClient || !clientName) {
         resolvedOrigin = 'https://music.youtube.com';
         resolvedReferer = 'https://music.youtube.com/';
-      } else {
-        resolvedOrigin = null;
-        resolvedReferer = null;
-
-        if (clientName.startsWith('ANDROID')) {
-          if (clientName === 'ANDROID_MUSIC') {
-            resolvedUserAgent = 'com.google.android.youtube.music/5.34.51 (Linux; U; Android 12; en_US) gzip';
-          } else if (clientName === 'ANDROID_VR') {
-            resolvedUserAgent = 'com.google.android.apps.youtube.vr.oculus/1.65.10 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip';
-          } else {
-            resolvedUserAgent = 'com.google.android.youtube/21.03.36(Linux; U; Android 16; en_US; SM-S908E Build/TP1A.220624.014) gzip';
-          }
-        } else if (clientName.startsWith('IOS')) {
-          if (clientName === 'IOS_MUSIC') {
-            resolvedUserAgent = 'com.google.ios.youtube.music/5.34.51 (iPhone; U; CPU iOS 16_7_7 like Mac OS X)';
-          } else {
-            resolvedUserAgent = 'com.google.ios.youtube/20.11.6 (iPhone10,4; U; CPU iOS 16_7_7 like Mac OS X)';
-          }
+      } else if (clientName.startsWith('ANDROID')) {
+        if (clientName === 'ANDROID_MUSIC') {
+          resolvedUserAgent = 'com.google.android.youtube.music/5.34.51 (Linux; U; Android 12; en_US) gzip';
+        } else if (clientName === 'ANDROID_VR') {
+          resolvedUserAgent = 'com.google.android.apps.youtube.vr.oculus/1.65.10 (Linux; U; Android 12L; eureka-user Build/SQ3A.220605.009.A1) gzip';
+        } else {
+          resolvedUserAgent = 'com.google.android.youtube/21.03.36(Linux; U; Android 16; en_US; SM-S908E Build/TP1A.220624.014) gzip';
         }
+      } else if (clientName.startsWith('IOS')) {
+        resolvedOrigin = 'https://www.youtube.com';
+        resolvedReferer = 'https://www.youtube.com/';
+        if (clientName === 'IOS_MUSIC') {
+          resolvedUserAgent = 'com.google.ios.youtube.music/5.34.51 (iPhone; U; CPU iOS 16_7_7 like Mac OS X)';
+        } else {
+          resolvedUserAgent = 'com.google.ios.youtube/20.11.6 (iPhone10,4; U; CPU iOS 16_7_7 like Mac OS X)';
+        }
+      }
+
+      const customUa = parsedUrl?.searchParams.get('__lune_ua');
+      if (customUa) {
+        resolvedUserAgent = customUa;
       }
 
       if (resolvedOrigin) {
