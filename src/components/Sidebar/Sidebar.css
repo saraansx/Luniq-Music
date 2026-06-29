@@ -337,40 +337,39 @@
 }
 
 .sidebar-add-menu {
-    position: absolute;
-    top: 36px;
-    right: 0;
-    background: rgba(24, 24, 28, 0.85);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 6px;
-    display: flex;
-    flex-direction: column;
-    min-width: 180px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    z-index: 100;
-    gap: 2px;
+  position: absolute;
+  top: 36px;
+  right: 0;
+  background: #181818;
+  border: 1px solid #282828;
+  border-radius: 12px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  animation: luneDropdownFadeDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top right;
 }
 
 .sidebar-add-menu button {
+  display: flex;
+  align-items: center;
+  width: 100%;
   background: transparent;
   border: none;
-  color: var(--text-main);
+  color: #ffffff;
   text-align: left;
   padding: 10px 12px;
   font-size: 13px;
   cursor: pointer;
-  border-radius: 6px;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  border-radius: 8px;
+  transition: background 0.12s;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .sidebar-add-menu button:hover {
-    background: rgba(var(--accent-rgb), 0.15);
-    color: var(--text-main);
+  background: rgba(255, 255, 255, 0.08);
 }

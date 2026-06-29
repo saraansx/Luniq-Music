@@ -172,10 +172,8 @@ button {
   position: absolute;
   bottom: calc(100% + 8px);
   right: 0;
-  background: rgba(15, 15, 18, 0.95);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #181818;
+  border: 1px solid #282828;
   border-radius: 12px;
   padding: 6px;
   min-width: 180px;

@@ -26,6 +26,7 @@ All notable changes to Lune will be documented in this file.
 - **Stream URL HEAD Validation:** Before returning a stream URL, the main process sends a `HEAD` request to verify it responds with 2xx. If it returns 403/404/410, the URL is rejected and the next engine/client is tried.
 - **Per-Track Cache Invalidation:** New `invalidate-stream-cache` IPC handler clears the cached stream URL for a specific track across both audio engines.
 - **Autoplay Queue UI:** Queue panel now shows a dedicated "Next in Autoplay" section below the regular queue (Spotify-style), with a live loading indicator while the radio pool is being filled.
+- **Playlist Creation Options:** Clicking the Add (+) icon in the Sidebar now reveals a dropdown menu to choose between "Create local playlist" and "Create spotify playlist".
 
 #### Changed
 
@@ -37,7 +38,7 @@ All notable changes to Lune will be documented in this file.
 - **Cache Invalidation Alignment:** `youtubei.js` and `yt-dlp` cache invalidation now targets the correct `webm` cache key, matching the engines' internal behavior.
 - **Default Audio Quality:** Increased the default audio streaming and download quality for new installations to `320 kbps` (previously `256 kbps` and `128 kbps`).
 - **Dynamic Home Greeting:** The Home page greeting now dynamically adjusts based on the local time (Good Morning/Afternoon/Evening) and includes the connected user's Spotify display name.
-
+- **Standardized Menus:** Unified the design of all dropdown and context menus across the app (Equalizer, 3-dots, Sleep Timer, Sidebar context menus) to use a consistent solid dark `#181818` background theme.
 #### Fixed
 
 - **Fixed Taskbar Controls Display:** The Windows taskbar thumbnail controls (Play/Pause/Skip) are now properly hidden on the Login and Home pages, and will only appear when a track is actively loaded into the player.
