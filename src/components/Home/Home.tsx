@@ -382,53 +382,68 @@ const Home = ({ accessToken: _accessToken, cookies, onPlaylistSelect, onTrackVie
                         </button>
                     </div>
                 )}
-                {sections.filter(s => s.items.length > 0 && s.title && !s.title.toLowerCase().includes("unknown") && !s.title.toLowerCase().includes("recently")).map((section, index) => {
-                    const isSixPack = index === 0;
-                    const displayTitle = section.title || (isSixPack ? t('home.jumpBackIn') : t('home.recommended'));
-                    return (
-                        <section key={section.id} className="browse-section">
-                            <div className="section-header">
-                                <h2 className="home-section-title">{displayTitle}</h2>
-                                <button
-                                    className="show-all-btn"
-                                    onClick={() => handleShowAll(section)}
-                                >
-                                    {t('home.showAll')}
-                                </button>
-                            </div>
-                            <div className={`items-grid ${isSixPack ? 'six-pack' : ''}`}>
-                                {section.items.map((item) => (
-                                    <div key={item.uri} className="card" onClick={() => handleCardClick(item)}>
-                                        <div className="card-image-wrapper">
-                                            <img
-                                                src={item.images[0]?.url || 'placeholder.png'}
-                                                alt={item.name}
-                                                className="card-image"
-                                                loading="lazy"
-                                            />
-                                            <div className="play-button" onClick={(e) => handlePlayButtonClick(e, item)}>
-                                                <svg role="img" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
-                                                    <path d="M7.05 3.606l13.49 7.788a.7.7 0 010 1.212L7.05 20.394A.7.7 0 016 19.788V4.212a.7.7 0 011.05-.606z"></path>
-                                                </svg>
-                                            </div>
+                {sections
+                    .filter(s => {
+                        if (!s.items || s.items.length === 0 || !s.title) return false;
+                        const title = s.title.toLowerCase();
+                        if (title.includes("unknown") || title.includes("recently")) return false;
+                        if (title.includes("episode") || title.includes("podcast") || title.includes("show") || title.includes("audiobook")) return false;
+                        return true;
+                    })
+                    .map((section, index) => {
+                        const isSixPack = index === 0;
+                        const displayTitle = section.title || (isSixPack ? t('home.jumpBackIn') : t('home.recommended'));
+                        const filteredItems = section.items.filter(item => {
+                            const uri = item.uri || "";
+                            return !uri.includes(":episode:") && !uri.includes(":show:");
+                        });
+                        
+                        if (filteredItems.length === 0) return null;
 
+                        return (
+                            <section key={section.id} className="browse-section">
+                                <div className="section-header">
+                                    <h2 className="home-section-title">{displayTitle}</h2>
+                                    <button
+                                        className="show-all-btn"
+                                        onClick={() => handleShowAll(section)}
+                                    >
+                                        {t('home.showAll')}
+                                    </button>
+                                </div>
+                                <div className={`items-grid ${isSixPack ? 'six-pack' : ''}`}>
+                                    {filteredItems.map((item) => (
+                                        <div key={item.uri || item.id} className="card" onClick={() => handleCardClick(item)}>
+                                            <div className="card-image-wrapper">
+                                                <img
+                                                    src={item.images[0]?.url || 'placeholder.png'}
+                                                    alt={item.name}
+                                                    className="card-image"
+                                                    loading="lazy"
+                                                />
+                                                <div className="play-button" onClick={(e) => handlePlayButtonClick(e, item)}>
+                                                    <svg role="img" height="24" width="24" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M7.05 3.606l13.49 7.788a.7.7 0 010 1.212L7.05 20.394A.7.7 0 016 19.788V4.212a.7.7 0 011.05-.606z"></path>
+                                                    </svg>
+                                                </div>
+
+                                            </div>
+                                            <div className="card-content">
+                                                <h3 className="card-title">{item.name}</h3>
+                                                <p className="card-subtitle">
+                                                    {item.objectType === 'Playlist'
+                                                        ? (item.owner?.display_name ? `${t('home.by')} ${item.owner.display_name}` : item.description)
+                                                        : item.objectType === 'Album'
+                                                            ? (item.artists && item.artists.length > 0 ? item.artists[0].name : t('home.album'))
+                                                            : t('home.artist')}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="card-content">
-                                            <h3 className="card-title">{item.name}</h3>
-                                            <p className="card-subtitle">
-                                                {item.objectType === 'Playlist'
-                                                    ? (item.owner?.display_name ? `${t('home.by')} ${item.owner.display_name}` : item.description)
-                                                    : item.objectType === 'Album'
-                                                        ? (item.artists && item.artists.length > 0 ? item.artists[0].name : t('home.album'))
-                                                        : t('home.artist')}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-                    );
-                })}
+                                    ))}
+                                </div>
+                            </section>
+                        );
+                    })}
             </div>
         </div>
     );

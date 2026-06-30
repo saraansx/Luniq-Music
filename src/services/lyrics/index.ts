@@ -5,6 +5,7 @@ import { fetchLrcLibLyrics } from "./lrclib";
 import { fetchKugouLyrics } from "./kugou";
 import { fetchSimpMusicLyrics } from "./simpmusic";
 import { fetchUnisonLyrics } from "./unison";
+import { fetchYouLyPlusLyrics } from "./youlyplus";
 import { transliterate } from "transliteration";
 
 export interface LyricData {
@@ -28,6 +29,7 @@ export { fetchLrcLibLyrics } from "./lrclib";
 export { fetchKugouLyrics } from "./kugou";
 export { fetchSimpMusicLyrics } from "./simpmusic";
 export { fetchUnisonLyrics } from "./unison";
+export { fetchYouLyPlusLyrics } from "./youlyplus";
 
 const ensureRomanized = (data: LyricData): LyricData => {
   if (!data.romanizedLyrics) {
@@ -132,6 +134,14 @@ export const fetchLyrics = async (
     data = await fetchBetterLyrics(cleanTrackName, primaryArtist, duration, albumName);
     if (data) {
       console.log(`[Lyrics] Resolved "${cleanTrackName}" via BetterLyrics in ${Math.round(performance.now() - startTime)}ms`);
+      data = ensureRomanized(data);
+      try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
+      return data;
+    }
+
+    data = await fetchYouLyPlusLyrics(cleanTrackName, primaryArtist, duration, albumName);
+    if (data) {
+      console.log(`[Lyrics] Resolved "${cleanTrackName}" via YouLyPlus in ${Math.round(performance.now() - startTime)}ms`);
       data = ensureRomanized(data);
       try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
       return data;

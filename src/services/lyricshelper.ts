@@ -1,6 +1,7 @@
 import { LyricData } from './lyrics/index';
 import { fetchSpotifyLyrics } from './lyrics/spotify';
 import { fetchBetterLyrics } from './lyrics/betterlyrics';
+import { fetchYouLyPlusLyrics } from './lyrics/youlyplus';
 import { fetchPaxsenixLyrics } from './lyrics/paxsenix';
 import { fetchLrcLibLyrics } from './lyrics/lrclib';
 import { fetchKugouLyrics } from './lyrics/kugou';
@@ -20,7 +21,7 @@ const ensureRomanized = (data: LyricData): LyricData => {
     return data;
 };
 
-const raceProviders = (providers: (() => Promise<LyricData | null>)[]): Promise<LyricData | null> => {
+const raceProviders = <T>(providers: (() => Promise<T | null>)[]): Promise<T | null> => {
     return new Promise((resolve) => {
         let failedCount = 0;
         let isResolved = false;
@@ -88,39 +89,36 @@ export const fetchLyricsSmart = async (
         console.warn("[LyricsHelper] Cache read error:", e);
     }
 
-    console.log(`[LyricsHelper] Fetching lyrics for: ${cleanTrackName} by ${primaryArtist}`);
+    const startTime = performance.now();
 
-    console.log(`[LyricsHelper] Step 1: Requesting from Primary Provider (Native Spotify)...`);
     let data = await fetchSpotifyLyrics(cleanTrackName, primaryArtist, duration, albumName, videoId);
-    
     if (data) {
-        console.log(`[LyricsHelper] Native Spotify matched successfully!`);
+        console.log(`[LyricsHelper] Resolved "${cleanTrackName}" via Spotify in ${Math.round(performance.now() - startTime)}ms`);
         data = ensureRomanized(data);
         localStorage.setItem(cacheKey, JSON.stringify(data));
         return data;
     }
-
-    console.log(`[LyricsHelper] Spotify failed. Step 2: Launching Parallel Race for fallbacks!`);
 
     const fallbacks = [
-        () => fetchBetterLyrics(cleanTrackName, primaryArtist, duration, albumName).then(d => { if(d) console.log('[LyricsHelper] BetterLyrics won the race!'); return d; }),
-        () => fetchPaxsenixLyrics(cleanTrackName, primaryArtist, duration, albumName).then(d => { if(d) console.log('[LyricsHelper] Paxsenix won the race!'); return d; }),
-        () => fetchLrcLibLyrics(cleanTrackName, primaryArtist, duration).then(d => { if(d) console.log('[LyricsHelper] LRCLib won the race!'); return d; }),
-        () => fetchKugouLyrics(cleanTrackName, primaryArtist, duration, albumName).then(d => { if(d) console.log('[LyricsHelper] KuGou won the race!'); return d; }),
-        () => fetchUnisonLyrics(cleanTrackName, primaryArtist, videoId, duration, albumName).then(d => { if(d) console.log('[LyricsHelper] Unison won the race!'); return d; }),
-        () => fetchSimpMusicLyrics(cleanTrackName, primaryArtist, videoId, duration, albumName).then(d => { if(d) console.log('[LyricsHelper] SimpMusic won the race!'); return d; })
+        () => fetchBetterLyrics(cleanTrackName, primaryArtist, duration, albumName).then(d => d ? { provider: 'BetterLyrics', data: d } : null),
+        () => fetchYouLyPlusLyrics(cleanTrackName, primaryArtist, duration, albumName).then(d => d ? { provider: 'YouLyPlus', data: d } : null),
+        () => fetchPaxsenixLyrics(cleanTrackName, primaryArtist, duration, albumName).then(d => d ? { provider: 'Paxsenix', data: d } : null),
+        () => fetchLrcLibLyrics(cleanTrackName, primaryArtist, duration).then(d => d ? { provider: 'LRCLib', data: d } : null),
+        () => fetchKugouLyrics(cleanTrackName, primaryArtist, duration, albumName).then(d => d ? { provider: 'KuGou', data: d } : null),
+        () => fetchUnisonLyrics(cleanTrackName, primaryArtist, videoId, duration, albumName).then(d => d ? { provider: 'Unison', data: d } : null),
+        () => fetchSimpMusicLyrics(cleanTrackName, primaryArtist, videoId, duration, albumName).then(d => d ? { provider: 'SimpMusic', data: d } : null)
     ];
 
-    data = await raceProviders(fallbacks);
+    const result = await raceProviders(fallbacks) as { provider: string; data: LyricData } | null;
 
-    if (data) {
-        data = ensureRomanized(data);
-        localStorage.setItem(cacheKey, JSON.stringify(data));
-        return data;
+    if (result) {
+        console.log(`[LyricsHelper] Resolved "${cleanTrackName}" via ${result.provider} in ${Math.round(performance.now() - startTime)}ms`);
+        let resolvedData = ensureRomanized(result.data);
+        localStorage.setItem(cacheKey, JSON.stringify(resolvedData));
+        return resolvedData;
     }
 
-                          
-    console.log(`[LyricsHelper] All 8 providers failed to find lyrics for: ${cleanTrackName}`);
+    console.log(`[LyricsHelper] No lyrics found for "${cleanTrackName}" by ${primaryArtist} (checked all 8 providers in ${Math.round(performance.now() - startTime)}ms)`);
     localStorage.setItem(cacheKey, 'NOT_FOUND');
     return null;
 };

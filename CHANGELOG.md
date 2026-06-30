@@ -8,6 +8,13 @@ All notable changes to Lune will be documented in this file.
 
 #### Added
 
+- **YouLyPlus Lyrics Provider:** Integrated the YouLyPlus engine, cascading requests across 5 mirror servers with support for XML-based TTML parsing and raw LRC fallback synchronization.
+- **Multitasked Parallel Racing:** Overhauled `lyricshelper.ts` to race lyric retrieval requests in parallel, returning single-line timed reports identifying the winning provider.
+- **Paxsenix Cascading Fallbacks:** Re-implemented the Paxsenix provider to cascade queries sequentially through Apple Music, NetEase, Spotify, Musixmatch, and YouTube mirror API endpoints.
+- **KuGou Duration & Keyword Matching:** Upgraded KuGou provider to filter candidates by duration tolerance and fall back to direct keyword metadata search queries.
+- **LRCLib Similarity Matching:** Implemented Levenshtein distance string similarity scoring and duration verification inside the LRCLib search handler.
+- **Unison Database Search:** Upgraded Unison provider to fall back to `/lyrics/search` to retrieve candidate summaries and resolve full entries by ID.
+- **Programmatic Deprecation Suppression:** Added an early interceptor in the Electron boot shim to silence the Node.js `punycode` deprecation warning before dependency load.
 - **Local HTTP Stream Proxy:** Implemented a local HTTP media streaming proxy in Electron that intercepts chunk requests, dynamically sets client-specific User-Agents, and routes stream data cleanly using Node's HTTP/1.1 fetch stack to bypass Chromium's HTTP/2 restriction.
 - **Proxy connection auto-abort:** Tied an `AbortController` to the proxy's client connection close events, preventing background fetch threads from hanging or wasting bandwidth when seeking or skipping tracks.
 - **Spotify History Sync (GQL):** The app now automatically syncs your remote Spotify "Recently Played" history into the Queue's History tab using GraphQL, intelligently parsing and mapping Context items into tracks without hitting strict REST API rate limits (HTTP 429).
@@ -32,6 +39,7 @@ All notable changes to Lune will be documented in this file.
 
 #### Changed
 
+- **Homepage Feed Optimization:** Filtered out podcast episode sections ("Episodes you might like"), show recommendations, and audiobook items from the Spotify home feed to ensure a 100% music-focused layout.
 - **Home Screen Cleanup:** Hid the "Recently played" section from the main Home page browse grid, as it's now properly integrated into the Queue History tab.
 - **Login UI Polish:** Refined the "Connect with Spotify" button on the Login page. Replaced the older dark green icon with Spotify's modern lighter green (`#1ed760`) and added a subtle, soft drop-shadow for better contrast against dark backgrounds.
 - **Login Localization:** Updated the Spotify connection prompt from "Continue with Spotify" to "Connect with Spotify" across all 20 supported languages.
@@ -59,6 +67,7 @@ All notable changes to Lune will be documented in this file.
 - **Disabled Google Sign-In:** The "Continue with Google" button on the Spotify login page has been greyed out and disabled since social login flows are not officially supported within the app's embedded auth window.
 - **Fixed `yt-dlp` PyInstaller Extraction Errors:** Added a startup cleanup script that automatically deletes stale `_MEI` folders left behind by `yt-dlp` in the system's temporary directory. This prevents the `return code -3` extraction failure caused by lingering files or corrupted temp caches.
 - **Fixed Auto-Skip on Re-Play:** Fixed a bug where clicking "Play" on a track that was already in the process of loading would mistakenly cancel the ongoing stream request, causing a stream error and forcing the player to auto-skip to the next song.
+- **Log Simplification & Cleanup:** Silenced verbose InnerTube decipher, resolution, and prefetch logs in favor of single-line timing summaries. Removed emojis from all system log entries to improve readability.
 
 ### Security
 
