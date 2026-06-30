@@ -40,7 +40,7 @@ All notable changes to Lune will be documented in this file.
 
 #### Changed
 
-- **Console Log Cleanup & Optimization:** Consolidated multiple settings and lyrics helper messages into single-line summaries, and removed React's StrictMode wrapper from the main React bootstrapper to eliminate double-render log spams in development console.
+- **Console Log Cleanup & Optimization:** Consolidated multiple settings and lyrics helper messages into single-line summaries, silenced redundant WebRequest HTTP 404/401 error response logs from parallel fallback engines, and removed React's StrictMode wrapper from the main React bootstrapper to eliminate double-render log spams in development console.
 - **Homepage Feed Optimization:** Filtered out podcast episode sections ("Episodes you might like"), show recommendations, and audiobook items from the Spotify home feed to ensure a 100% music-focused layout.
 - **Home Screen Cleanup:** Hid the "Recently played" section from the main Home page browse grid, as it's now properly integrated into the Queue History tab.
 - **Login UI Polish:** Refined the "Connect with Spotify" button on the Login page. Replaced the older dark green icon with Spotify's modern lighter green (`#1ed760`) and added a subtle, soft drop-shadow for better contrast against dark backgrounds.

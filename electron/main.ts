@@ -765,10 +765,6 @@ app.whenReady().then(async () => {
     const responseHeaders = details.responseHeaders || {};
     const url = details.url.toLowerCase();
     if (url.includes('youtube.com') || url.includes('lrclib.net') || url.includes('boidu.dev')) {
-      if (details.statusCode >= 400) {
-        console.error(`[WebRequest] Error response received: status=${details.statusCode}, url=${details.url.slice(0, 120)}...`);
-
-      }
       requestHeadersMap.delete(details.id);
       
       const keysToDelete = [
