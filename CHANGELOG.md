@@ -8,6 +8,7 @@ All notable changes to Lune will be documented in this file.
 
 #### Added
 
+- **Command-Line Lyrics Test Suite:** Added a dedicated CLI script `scripts/test_lyrics.ts` to test and verify all registered lyrics providers directly, including native Spotify credentials extraction.
 - **YouLyPlus Lyrics Provider:** Integrated the YouLyPlus engine, cascading requests across 5 mirror servers with support for XML-based TTML parsing and raw LRC fallback synchronization.
 - **Multitasked Parallel Racing:** Overhauled `lyricshelper.ts` to race lyric retrieval requests in parallel, returning single-line timed reports identifying the winning provider.
 - **Paxsenix Cascading Fallbacks:** Re-implemented the Paxsenix provider to cascade queries sequentially through Apple Music, NetEase, Spotify, Musixmatch, and YouTube mirror API endpoints.
@@ -39,6 +40,7 @@ All notable changes to Lune will be documented in this file.
 
 #### Changed
 
+- **Console Log Cleanup & Optimization:** Consolidated multiple settings and lyrics helper messages into single-line summaries, and removed React's StrictMode wrapper from the main React bootstrapper to eliminate double-render log spams in development console.
 - **Homepage Feed Optimization:** Filtered out podcast episode sections ("Episodes you might like"), show recommendations, and audiobook items from the Spotify home feed to ensure a 100% music-focused layout.
 - **Home Screen Cleanup:** Hid the "Recently played" section from the main Home page browse grid, as it's now properly integrated into the Queue History tab.
 - **Login UI Polish:** Refined the "Connect with Spotify" button on the Login page. Replaced the older dark green icon with Spotify's modern lighter green (`#1ed760`) and added a subtle, soft drop-shadow for better contrast against dark backgrounds.
@@ -52,6 +54,8 @@ All notable changes to Lune will be documented in this file.
 
 #### Fixed
 
+- **Fixed Paxsenix Duration Filtering:** Added duration-string format support to the Paxsenix Spotify and YouTube search reducers to prevent duration-tolerance mismatches when parsing non-millisecond duration values.
+
 - **Fixed Anonymous Google Video Range Block:** Resolved the issue where Google Video Server rejected offset range requests past 1MB with a `403 Forbidden` for anonymous clients. Prioritized the `"ANDROID_VR"` client, which natively supports offset range requests past 1MB without requiring cookies or active session verification.
 - **Suppressed Chromium Media Encoder Errors:** Appended the `'log-level'` switch (set to `'3'`) on Electron startup to fully suppress internal Chromium-native D3D device encoder error logs (`0xC00D6D76`) from the developer console.
 - **Fixed console-message Deprecation Warning:** Updated the `'console-message'` webContents event listener structure to conform to Electron 30+, eliminating compiler type conflicts and console deprecation warnings.
@@ -64,7 +68,7 @@ All notable changes to Lune will be documented in this file.
 - **Build Configuration Schema:** Suppressed false-positive IDE schema warnings in `electron-builder.json` by removing the outdated schema URL.
 - **Type Declaration Missing:** Restored Vite's client typings (`/// <reference types="vite/client" />`) in `vite-env.d.ts` to fix missing module errors for image assets in the IDE.
 - **Spotify Auth Popup Improvements:** The Spotify sign-in popup now displays the correct Lune app icon and title. The flow also bypasses the "Download Spotify" trap page by instantly detecting the auth cookie upon a successful login or signup and closing automatically.
-- **Disabled Google Sign-In:** The "Continue with Google" button on the Spotify login page has been greyed out and disabled since social login flows are not officially supported within the app's embedded auth window.
+- **Enabled Google Social Sign-In & Session Isolation:** Configured the login window to spoof a standard Firefox User-Agent, bypassing Google's WebView security blocks. Also isolated the login session using dynamic, in-memory partitions, ensuring that failed or incorrect social logins (e.g. choosing a Google account not linked to Spotify) clear immediately, allowing users to try a different account without getting stuck on cached cookies.
 - **Fixed `yt-dlp` PyInstaller Extraction Errors:** Added a startup cleanup script that automatically deletes stale `_MEI` folders left behind by `yt-dlp` in the system's temporary directory. This prevents the `return code -3` extraction failure caused by lingering files or corrupted temp caches.
 - **Fixed Auto-Skip on Re-Play:** Fixed a bug where clicking "Play" on a track that was already in the process of loading would mistakenly cancel the ongoing stream request, causing a stream error and forcing the player to auto-skip to the next song.
 - **Log Simplification & Cleanup:** Silenced verbose InnerTube decipher, resolution, and prefetch logs in favor of single-line timing summaries. Removed emojis from all system log entries to improve readability.
