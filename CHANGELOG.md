@@ -55,6 +55,7 @@ All notable changes to Lune will be documented in this file.
 
 #### Fixed
 
+- **Fixed Audio Output Device Selection:** Fixed an issue where changing the playback device in Lune settings did not route audio correctly and kept playing to the default system device. Since the audio is routed through a Web Audio API graph (for EQ, Mono, and Volume Normalization), the device must be applied to both the `AudioContext` destination node and the HTML `<audio>` node.
 - **Fixed Paxsenix Duration Filtering:** Added duration-string format support to the Paxsenix Spotify and YouTube search reducers to prevent duration-tolerance mismatches when parsing non-millisecond duration values.
 
 - **Fixed Anonymous Google Video Range Block:** Resolved the issue where Google Video Server rejected offset range requests past 1MB with a `403 Forbidden` for anonymous clients. Prioritized the `"ANDROID_VR"` client, which natively supports offset range requests past 1MB without requiring cookies or active session verification.

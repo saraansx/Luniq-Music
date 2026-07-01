@@ -118,6 +118,11 @@ const PlayerBar: React.FC<{
         console.log("[Audio] Initializing Web Audio API nodes...");
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         audioCtxRef.current = new AudioCtx();
+        if (audioDeviceId !== "default" && (audioCtxRef.current as any).setSinkId) {
+          (audioCtxRef.current as any).setSinkId(audioDeviceId).catch((err: any) => {
+            console.error("[Audio] Failed to set initial AudioContext output device:", err);
+          });
+        }
         sourceRef.current = audioCtxRef.current.createMediaElementSource(
           audioRef.current,
         );
@@ -301,14 +306,25 @@ const PlayerBar: React.FC<{
   
   useEffect(() => {
     const applyDevice = async () => {
+      const sinkId = audioDeviceId === "default" ? "" : audioDeviceId;
+
+      // Apply to AudioContext if active (since it controls output when Web Audio API is engaged)
+      if (audioCtxRef.current && (audioCtxRef.current as any).setSinkId) {
+        try {
+          console.log(`[Audio] Switching AudioContext output device to: ${audioDeviceId}`);
+          await (audioCtxRef.current as any).setSinkId(sinkId);
+        } catch (err) {
+          console.error("[Audio] Failed to set AudioContext output device:", err);
+        }
+      }
+
+      // Apply to HTMLAudioElement (for fallback/direct routing when graph is bypassed)
       if (audioRef.current && audioRef.current.setSinkId) {
         try {
-          console.log(`[Audio] Switching output device to: ${audioDeviceId}`);
-          await audioRef.current.setSinkId(
-            audioDeviceId === "default" ? "" : audioDeviceId,
-          );
+          console.log(`[Audio] Switching HTMLAudioElement output device to: ${audioDeviceId}`);
+          await audioRef.current.setSinkId(sinkId);
         } catch (err) {
-          console.error("[Audio] Failed to set output device:", err);
+          console.error("[Audio] Failed to set HTMLAudioElement output device:", err);
         }
       }
     };
