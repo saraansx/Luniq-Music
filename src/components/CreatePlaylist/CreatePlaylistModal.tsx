@@ -72,75 +72,75 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({ onClose, onCr
                     </button>
                 </div>
 
-                {}
-                <div
-                    className={`artwork-picker ${artwork ? 'has-image' : ''}`}
-                    onClick={handleArtworkClick}
-                >
-                    {artwork ? (
-                        <img src={artwork} alt="Playlist artwork" className="artwork-preview" />
-                    ) : (
-                        <>
-                            <svg className="artwork-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                <circle cx="8.5" cy="8.5" r="1.5" />
-                                <polyline points="21 15 16 10 5 21" />
-                            </svg>
-                            <span className="artwork-placeholder-text">{isEditMode ? t('createPlaylist.changeArtwork') : t('createPlaylist.addArtwork')}</span>
-                        </>
-                    )}
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                    />
+                <div className="create-playlist-body">
+                    {/* Left Column: Artwork picker */}
+                    <div
+                        className={`artwork-picker ${artwork ? 'has-image' : ''}`}
+                        onClick={handleArtworkClick}
+                    >
+                        {artwork ? (
+                            <img src={artwork} alt="Playlist artwork" className="artwork-preview" />
+                        ) : (
+                            <>
+                                <svg className="artwork-placeholder-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                </svg>
+                                <span className="artwork-placeholder-text">{isEditMode ? t('createPlaylist.changeArtwork') : t('createPlaylist.addArtwork')}</span>
+                            </>
+                        )}
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                        />
+                    </div>
+
+                    {/* Right Column: Form fields */}
+                    <div className="create-playlist-form">
+                        <div className="form-field">
+                            <input
+                                type="text"
+                                placeholder={t('createPlaylist.namePlaceholder')}
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                autoFocus
+                                maxLength={100}
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="form-field description-field">
+                            <textarea
+                                placeholder={t('createPlaylist.descriptionPlaceholder')}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                maxLength={300}
+                                disabled={loading}
+                            />
+                        </div>
+                    </div>
                 </div>
 
-                {}
-                <div className="create-playlist-form">
-                    <div className="form-field">
-                        <label>{t('createPlaylist.playlistName')}</label>
-                        <input
-                            type="text"
-                            placeholder={t('createPlaylist.namePlaceholder')}
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            autoFocus
-                            maxLength={100}
-                            disabled={loading}
-                        />
-                    </div>
-
-                    <div className="form-field">
-                        <label>{t('createPlaylist.description')}</label>
-                        <textarea
-                            placeholder={t('createPlaylist.descriptionPlaceholder')}
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            maxLength={300}
-                            disabled={loading}
-                        />
-                    </div>
-
-                    {}
-                    <div className="create-playlist-actions">
-                        <button className="btn-cancel" onClick={onClose} disabled={loading}>{t('createPlaylist.cancel')}</button>
-                        <button
-                            className={`btn-create ${loading ? 'loading' : ''}`}
-                            onClick={handleSubmit}
-                            disabled={!name.trim() || loading}
-                        >
-                            {loading ? (
-                                <svg className="spinner" viewBox="0 0 50 50">
-                                    <circle className="path" cx="25" cy="25" r="20" fill="none" strokeWidth="5"></circle>
-                                </svg>
-                            ) : (
-                                isEditMode ? t('createPlaylist.save') : t('createPlaylist.create')
-                            )}
-                        </button>
-                    </div>
+                {/* Actions at the bottom */}
+                <div className="create-playlist-actions">
+                    <button className="btn-cancel" onClick={onClose} disabled={loading}>{t('createPlaylist.cancel')}</button>
+                    <button
+                        className={`btn-create ${loading ? 'loading' : ''}`}
+                        onClick={handleSubmit}
+                        disabled={!name.trim() || loading}
+                    >
+                        {loading ? (
+                            <svg className="spinner" viewBox="0 0 50 50">
+                                <circle className="path" cx="25" cy="25" r="20" fill="none" strokeWidth="5"></circle>
+                            </svg>
+                        ) : (
+                            isEditMode ? t('createPlaylist.save') : t('createPlaylist.create')
+                        )}
+                    </button>
                 </div>
             </div>
         </div>,
