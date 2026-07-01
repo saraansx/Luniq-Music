@@ -8,6 +8,7 @@ All notable changes to Lune will be documented in this file.
 
 #### Added
 
+- **Redesigned Create Playlist Modal:** Overhauled the playlist creation and detail editing modal to adopt Spotify's side-by-side layout, positioning the artwork picker as a left column next to the stacked text input and description fields on the right. Simplified aesthetics by removing redundant input labels and changing the "ADD ARTWORK" label to a normal-cased "Choose photo" placeholder across all 21 translation files.
 - **Weblate Translation Integration:** Configured and integrated Weblate translation setup, registered translation instructions guidelines for translators, and unlocked automated pushing back to GitHub using authentication tokens.
 - **Tamil Language Support:** Added full Tamil translation (`ta.json`) and registered it in the i18n module and application settings language selection dropdown.
 - **Discord Rich Presence Activity Button:** Added an "🎧 Play on Lune" button linking to the GitHub repository, allowing friends on Discord to see what you are listening to and download the Lune app.
