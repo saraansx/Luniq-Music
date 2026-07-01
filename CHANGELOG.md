@@ -8,6 +8,7 @@ All notable changes to Lune will be documented in this file.
 
 #### Added
 
+- **Discord Rich Presence Activity Button:** Added an "🎧 Play on Lune" button linking to the GitHub repository, allowing friends on Discord to see what you are listening to and download the Lune app.
 - **Command-Line Lyrics Test Suite:** Added a dedicated CLI script `scripts/test_lyrics.ts` to test and verify all registered lyrics providers directly, including native Spotify credentials extraction.
 - **YouLyPlus Lyrics Provider:** Integrated the YouLyPlus engine, cascading requests across 5 mirror servers with support for XML-based TTML parsing and raw LRC fallback synchronization.
 - **Multitasked Parallel Racing:** Overhauled `lyricshelper.ts` to race lyric retrieval requests in parallel, returning single-line timed reports identifying the winning provider.

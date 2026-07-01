@@ -851,6 +851,7 @@ const PlayerBar: React.FC<{
             duration: finalDuration,
             currentTime: cTime * 1000,
             isPlaying: true,
+            trackId: currentTrack.id,
           });
         } else {
           await window.ipcRenderer?.invoke("update-rpc", {
@@ -986,7 +987,8 @@ const PlayerBar: React.FC<{
               albumArt: currentTrack.albumArt,
               duration: finalDuration,
               currentTime: newTime * 1000,
-              isPlaying: true, 
+              isPlaying: true,
+              trackId: currentTrack.id,
             })
             .catch(console.warn);
         }, 500);

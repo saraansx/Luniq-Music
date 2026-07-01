@@ -11,6 +11,7 @@ interface RPCActivity {
   assets: { large_image: string };
   instance: boolean;
   timestamps?: { start: number; end: number };
+  buttons?: { label: string; url: string }[];
 }
 
 interface RPCUpdateOptions {
@@ -21,6 +22,7 @@ interface RPCUpdateOptions {
   duration?: number;
   currentTime?: number;
   isPlaying?: boolean;
+  trackId?: string;
 }
 
 
@@ -161,6 +163,10 @@ export function registerRPCHandlers() {
       initRPC();
     }
 
+    const buttons: { label: string; url: string }[] = [
+      { label: "🎧 Play on Lune", url: "https://github.com/saraansx/Lune-Music" }
+    ];
+
     const activityObj: RPCActivity = {
       details: title || "",
       state: artist || "",
@@ -169,6 +175,7 @@ export function registerRPCHandlers() {
         large_image: albumArt || "lune_logo",
       },
       instance: false,
+      buttons,
     };
 
     if (duration && typeof currentTime === "number" && duration > 0) {
