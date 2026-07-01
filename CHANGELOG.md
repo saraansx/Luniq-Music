@@ -8,6 +8,8 @@ All notable changes to Lune will be documented in this file.
 
 #### Added
 
+- **Weblate Translation Integration:** Configured and integrated Weblate translation setup, registered translation instructions guidelines for translators, and unlocked automated pushing back to GitHub using authentication tokens.
+- **Tamil Language Support:** Added full Tamil translation (`ta.json`) and registered it in the i18n module and application settings language selection dropdown.
 - **Discord Rich Presence Activity Button:** Added an "🎧 Play on Lune" button linking to the GitHub repository, allowing friends on Discord to see what you are listening to and download the Lune app.
 - **Command-Line Lyrics Test Suite:** Added a dedicated CLI script `scripts/test_lyrics.ts` to test and verify all registered lyrics providers directly, including native Spotify credentials extraction.
 - **YouLyPlus Lyrics Provider:** Integrated the YouLyPlus engine, cascading requests across 5 mirror servers with support for XML-based TTML parsing and raw LRC fallback synchronization.

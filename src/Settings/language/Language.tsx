@@ -113,6 +113,7 @@ const Language: React.FC = () => {
         { value: 'vi', label: 'Tiếng Việt' },
         { value: 'id', label: 'Bahasa Indonesia' },
         { value: 'uk', label: 'Українська' },
+        { value: 'ta', label: 'தமிழ்' },
     ];
 
     const regionOptions = [

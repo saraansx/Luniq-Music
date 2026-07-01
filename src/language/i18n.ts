@@ -22,6 +22,8 @@ import th from './th.json';
 import vi from './vi.json';
 import id from './id.json';
 import uk from './uk.json';
+import ta from './ta.json';
+
 
 i18n
   .use(initReactI18next)
@@ -47,6 +49,8 @@ i18n
       vi: { translation: vi },
       id: { translation: id },
       uk: { translation: uk },
+      ta: { translation: ta },
+
     },
     lng: 'en', 
     fallbackLng: 'en',
