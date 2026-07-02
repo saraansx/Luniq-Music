@@ -99,7 +99,7 @@ Enjoying Luniq? Consider giving us a ⭐ to support the development and join our
 
 ### / Engagement
 
-[![Star History Chart](https://api.star-history.com/svg?repos=saraansx/Lune-Music&type=Date&theme=dark)](https://star-history.com/#saraansx/Lune-Music&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=saraansx/Luniq-Music&type=Date&theme=dark)](https://star-history.com/#saraansx/Luniq-Music&Date)
 
 <br />
 
