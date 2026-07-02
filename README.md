@@ -79,6 +79,18 @@ Luniq is built on a modern, high-performance stack designed for the desktop:
 
 <br />
 
+### 🌎 Globalization
+
+Luniq belongs to everyone. Help us localize the experience for your region.
+
+[![Translation status](https://hosted.weblate.org/widgets/luniq-music/-/svg-badge.svg)](https://hosted.weblate.org/engage/luniq-music/)
+
+<a href="https://hosted.weblate.org/engage/luniq-music/">
+  <img src="https://hosted.weblate.org/widgets/luniq-music/-/multi-auto.svg" alt="Translation status" />
+</a>
+
+<br />
+
 ### / Support
 
 Enjoying Luniq? Consider giving us a ⭐ to support the development and join our **[Discord](https://discord.gg/TardrVJT9N)** for updates!
