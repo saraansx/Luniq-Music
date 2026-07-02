@@ -3,7 +3,7 @@
 
   <br />
 
-  <h1>─── ✧ L U N E &nbsp; M U S I C ✧ ───</h1>
+  <h1>─── ✧ L U N I Q &nbsp; M U S I C ✧ ───</h1>
 
   <p><b>Luniq Music</b> (also known as <b>Luniq</b>) is a lightweight, open-source desktop music player developed by <b>saraansx</b>. It leverages Spotify's metadata to deliver ad-free streaming with smart autoplay capabilities, entirely without the need for a paid subscription. Built for performance and beautifully designed, it offers a fast and distraction-free environment for your entire music library.</p>
 
