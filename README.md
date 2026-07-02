@@ -24,16 +24,7 @@
 <br />
 
 <div align="center">
-  <img src="src/assets/Promotion/p4.png" width="100%" alt="Luniq Hero" />
-  <table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <tr>
-      <td width="50%"><img src="src/assets/Promotion/p2.png" width="100%" alt="Luniq Interface 2" /></td>
-      <td width="50%"><img src="src/assets/Promotion/p3.png" width="100%" alt="Luniq Interface 3" /></td>
-    </tr>
-    <tr>
-      <td colspan="2"><img src="src/assets/Promotion/p1.png" width="100%" alt="Luniq Interface 1" /></td>
-    </tr>
-  </table>
+  <img src="src/assets/Promotion/p1.png" width="100%" alt="Luniq Hero" />
 </div>
 
 <br />
