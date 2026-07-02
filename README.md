@@ -79,7 +79,7 @@ Luniq is built on a modern, high-performance stack designed for the desktop:
 
 <br />
 
-### 🌎 Globalization
+### / Globalization
 
 Help us sprinkle some magic and **[translate Luniq into your language](https://hosted.weblate.org/projects/luniq-music/)**!
 
