@@ -29,6 +29,20 @@
 
   <style>
     body { background-color: #050608; margin: 0; overflow: hidden; }
+    .coming-soon-container {
+      position: absolute;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: white;
+      background-color: #050608;
+    }
+    .cs-logo { width: 110px; height: auto; margin-bottom: 24px; }
+    .cs-title { font-size: 24px; font-weight: 300; letter-spacing: 0.4em; text-transform: uppercase; margin: 0 0 12px 0; text-indent: 0.4em; }
+    .cs-subtitle { font-size: 13px; color: rgba(255,255,255,0.4); font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase; margin: 0; }
   </style>
   <script type="application/ld+json">
     {
@@ -54,7 +68,13 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div class="coming-soon-container">
+      <img src="./src/assets/Luniq.png" class="cs-logo" alt="Luniq Logo" />
+      <h1 class="cs-title">LUNIQ</h1>
+      <p class="cs-subtitle">Website Coming Soon</p>
+    </div>
+  </div>
   <script type="module" src="./src/main.tsx"></script>
 </body>
 
