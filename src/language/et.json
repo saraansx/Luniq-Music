@@ -1,1 +1,14 @@
-{}
+{
+    "home.goodMorning": "Tere hommikust",
+    "home.goodAfternoon": "Tere päevast",
+    "home.goodEvening": "Tere õhtut",
+    "home.loading": "Laadin…",
+    "home.error": "Viga",
+    "home.backToHome": "Tagasi avalehele",
+    "home.retry": "Proovi uuesti",
+    "home.reLogin": "Logi uuesti sisse",
+    "home.emptyTitle": "Siin on kuidagi vaiksevõitu…",
+    "home.emptyDesc": "Me kuidagi ei suutnud sulle huvitavat sisu leidua.",
+    "home.reload": "Laad uuesti",
+    "home.showAll": "Näita kõike"
+}
