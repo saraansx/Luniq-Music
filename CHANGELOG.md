@@ -11,6 +11,7 @@ All notable changes to Luniq will be documented in this file.
 
 #### Fixed
 
+- **Verified by Spotify Badge:** Fixed the artist verification badge not appearing on artist profiles. Updated the `queryArtistOverview` GraphQL persisted query hash to a version that includes `profile.verified` in the response. Redesigned the badge to match Spotify's official "Verified by Spotify" style — a blue flower/seal icon with a white checkmark and "Verified by Spotify" label.
 - **Spotify Library Mutations (`addToLibrary`/`removeFromLibrary`):** Fixed a GraphQL variable naming mismatch across `artist`, `album`, `track`, and `playlist` endpoints where the API expected `libraryItemUris` but the code sent `uris`, causing HTTP 400 errors on follow, unfollow, save, and unsave operations.
 - **Credits Follow Button for Non-Artists:** Fixed an issue where the Follow button appeared for lyricists, composers, and producers in the Track Credits section. Following these non-artist contributors created empty artist pages in the library. The button now only renders for contributors whose roles include "Artist".
 
