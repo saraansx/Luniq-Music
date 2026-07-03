@@ -99,6 +99,28 @@ class SpotifyTrackEndpoint {
         SpotifyError.mayThrow(res);
         return res.data;
     }
+
+    async getTrackPreviews(uris: string[]) {
+        const hash = await getHash("Track", "trackPreview");
+
+        const res = await this.gqlClient.post("query", {
+            body: {
+                variables: {
+                    uris,
+                },
+                operationName: "trackPreview",
+                extensions: {
+                    persistedQuery: {
+                        version: 1,
+                        sha256Hash: hash,
+                    },
+                },
+            },
+        });
+
+        SpotifyError.mayThrow(res);
+        return res.data;
+    }
 }
 
 export { SpotifyTrackEndpoint };

@@ -1,0 +1,277 @@
+.preview-carousel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: preview-fade-in 0.2s ease;
+}
+
+@keyframes preview-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.preview-carousel-container {
+    width: 90%;
+    max-width: 1100px;
+    background: #181818;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    animation: preview-slide-up 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes preview-slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.preview-carousel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.preview-carousel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.preview-carousel-close {
+    background: rgba(255, 255, 255, 0.07);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.preview-carousel-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.preview-carousel-scroll-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.preview-carousel-track {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 8px 4px;
+    scrollbar-width: none;
+}
+
+.preview-carousel-track::-webkit-scrollbar {
+    display: none;
+}
+
+.preview-carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    transition: all 0.2s;
+    backdrop-filter: blur(8px);
+}
+
+.preview-carousel-nav:hover {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.preview-carousel-nav-left {
+    left: -18px;
+}
+
+.preview-carousel-nav-right {
+    right: -18px;
+}
+
+.preview-card {
+    flex-shrink: 0;
+    width: 150px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    border: 1px solid transparent;
+}
+
+.preview-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.preview-card.active {
+    border-color: var(--accent-main, #1db954);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.preview-card.no-preview {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.preview-card.no-preview:hover {
+    transform: none;
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.preview-card-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+}
+
+.preview-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-card-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.preview-card-play-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent-main, #1db954);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.preview-card:hover .preview-card-play-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.preview-card.active .preview-card-play-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.preview-card-playing {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 18px;
+    padding: 3px 5px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+}
+
+.preview-eq-bar {
+    width: 3px;
+    background: var(--accent-main, #1db954);
+    border-radius: 1px;
+    animation: preview-eq-bounce 0.6s ease-in-out infinite alternate;
+}
+
+.preview-eq-bar:nth-child(1) {
+    height: 60%;
+    animation-delay: 0s;
+}
+
+.preview-eq-bar:nth-child(2) {
+    height: 100%;
+    animation-delay: 0.2s;
+}
+
+.preview-eq-bar:nth-child(3) {
+    height: 40%;
+    animation-delay: 0.4s;
+}
+
+@keyframes preview-eq-bounce {
+    0% { transform: scaleY(0.3); }
+    100% { transform: scaleY(1); }
+}
+
+.preview-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.preview-progress-fill {
+    height: 100%;
+    background: var(--accent-main, #1db954);
+    transition: width 0.1s linear;
+    border-radius: 0 2px 2px 0;
+}
+
+.preview-card-info {
+    padding: 10px 12px;
+}
+
+.preview-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.preview-card-artist {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

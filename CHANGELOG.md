@@ -8,6 +8,7 @@ All notable changes to Luniq will be documented in this file.
 
 - **Track Credits Integration:** Built a beautiful new glassmorphic Track Credits UI in the Now Playing sidebar. Powered by a new Spotify GraphQL implementation, it dynamically fetches the real, comprehensive list of producers, composers, and lyricists for the currently playing track and elegantly formats them into interactive pill badges.
 - **Credits Follow Toggle:** The Track Credits section now has a working Follow/Following toggle button for artists. Clicking the button calls the Spotify `addToLibrary`/`removeFromLibrary` GraphQL mutation and persists the follow state. The button only appears for contributors with artist roles (Main Artist, Featured Artist), hiding it for lyricists, composers, and producers.
+- **Track Preview Carousel:** Added a "Scroll through previews" button on album and playlist pages. Opens a horizontal carousel of track cards with 30-second audio preview playback, progress bars, and equalizer animations. Tracks auto-advance to the next preview when finished. Uses Spotify's internal `trackPreview` GraphQL persisted query to fetch preview URLs.
 
 #### Fixed
 

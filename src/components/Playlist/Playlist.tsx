@@ -8,6 +8,7 @@ import CreatePlaylistModal from '../CreatePlaylist/CreatePlaylistModal';
 import ShuffleIcon from '../Icons/ShuffleIcon';
 import ShuffleButton from '../Shuffle/ShuffleButton';
 import { DownloadIndicator } from '../DownloadIndicator/DownloadIndicator';
+import PreviewCarousel from './PreviewCarousel';
 
 import { formatDuration } from '../../utils/format';
 
@@ -60,6 +61,8 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
     const [showPlaylistSubmenu, setShowPlaylistSubmenu] = useState(false);
     const isDownloading = activeBulkDownloads.has(playlistId || '');
     const [isInLocalLibrary, setIsInLocalLibrary] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
+    const [previewTracks, setPreviewTracks] = useState<any[]>([]);
 
                                                                                                 
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -71,6 +74,40 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
     }, []);
 
     const api = useApi();
+
+    const fetchPreviewTracks = async () => {
+        if (previewTracks.length > 0) {
+            setShowPreview(true);
+            return;
+        }
+        try {
+            if (tracks.length === 0) return;
+
+            const trackUris = tracks.map(t => `spotify:track:${t.id}`);
+            const data = await api.track.getTrackPreviews(trackUris);
+
+            const lookups = data?.trackPreview?.lookup || data?.lookup || [];
+
+            const mapped = tracks.map((track, index) => {
+                const lookup = lookups[index] || {};
+                const previewUrl = lookup?.data?.previews?.audioPreviewsV2?.items?.[0]?.url || null;
+                return {
+                    id: track.id,
+                    name: track.name,
+                    uri: `spotify:track:${track.id}`,
+                    image: track.albumArt || '',
+                    artists: track.artist ? [track.artist] : [],
+                    previewUrl,
+                };
+            }).filter((t) => t.previewUrl);
+
+            setPreviewTracks(mapped);
+            setShowPreview(true);
+        } catch (err) {
+            console.error('[Playlist] Failed to fetch track previews:', err);
+        }
+    };
+
     const handleDescriptionClick = (e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
         const anchor = target.closest('a');
@@ -764,6 +801,18 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
                     size={24}
                 />
 
+                <button
+                    className="playlist-dots-btn"
+                    title="Scroll through previews"
+                    onClick={fetchPreviewTracks}
+                >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="2" y="4" width="6" height="16" rx="1" />
+                        <rect x="10" y="4" width="6" height="16" rx="1" />
+                        <polygon points="18,8 24,4 24,20 18,16" />
+                    </svg>
+                </button>
+
                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <button
                         className="playlist-dots-btn"
@@ -1159,6 +1208,12 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
                         }));
                         setShowEditModal(false);
                     }}
+                />
+            )}
+            {showPreview && previewTracks.length > 0 && (
+                <PreviewCarousel
+                    tracks={previewTracks}
+                    onClose={() => setShowPreview(false)}
                 />
             )}
         </div>
