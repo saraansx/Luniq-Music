@@ -1214,6 +1214,7 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
                 <PreviewCarousel
                     tracks={previewTracks}
                     onClose={() => setShowPreview(false)}
+                    playlistName={playlist?.name}
                 />
             )}
         </div>
