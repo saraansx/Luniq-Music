@@ -9,12 +9,34 @@ All notable changes to Luniq will be documented in this file.
 - **Track Credits Integration:** Built a beautiful new glassmorphic Track Credits UI in the Now Playing sidebar. Powered by a new Spotify GraphQL implementation, it dynamically fetches the real, comprehensive list of producers, composers, and lyricists for the currently playing track and elegantly formats them into interactive pill badges.
 - **Credits Follow Toggle:** The Track Credits section now has a working Follow/Following toggle button for artists. Clicking the button calls the Spotify `addToLibrary`/`removeFromLibrary` GraphQL mutation and persists the follow state. The button only appears for contributors with artist roles (Main Artist, Featured Artist), hiding it for lyricists, composers, and producers.
 - **Track Preview Carousel:** Added a "Scroll through previews" button on album and playlist pages. Opens a horizontal carousel of track cards with 30-second audio preview playback, progress bars, and equalizer animations. Tracks auto-advance to the next preview when finished. Uses Spotify's internal `trackPreview` GraphQL persisted query to fetch preview URLs.
+- **Preview Panel Visualizer:** Animated 5-bar audio visualizer in the top-right corner of the preview overlay, synced live to playback state (bouncing when playing, static when paused/muted).
+- **Preview Volume Slider:** Horizontal range input in the top-right cluster; dragging to 0 auto-mutes the audio, dragging back up from 0 unmutes automatically.
+- **Preview Mute/Unmute Button:** Speaker icon toggle beside the volume slider that mutes or unmutes preview audio instantly on click.
+- **Preview Top-Right Control Cluster:** Visualizer, volume pill (mute icon + slider), thin separator, and close button are now grouped together in a single top-right flex row for clean, consolidated access.
+- **Artist Info Row (Preview Panel):** Bottom-left row in the preview panel showing the artist's circular avatar, name, `·` dot separator, monthly listeners count (e.g. `3.2M monthly listeners`), and a Follow / Following toggle button — all fetched live from the Spotify API.
+- **Preview Artist Data Fetching:** `PreviewCarousel` now calls `api.artist.getArtist()` each time the active track changes to retrieve the artist's profile image and `stats.monthlyListeners`.
+- **Preview Follow / Unfollow:** The Follow button in the artist row calls `api.artist.follow()` / `api.artist.unfollow()` and reflects the state instantly without a page reload.
+- **`artistId` on Preview Tracks:** `fetchPreviewTracks` in `Playlist.tsx` now maps the first artist's ID from `LuniqTrack.artists` into each preview track object so the carousel can query artist data.
 
 #### Fixed
 
 - **Verified by Spotify Badge:** Fixed the artist verification badge not appearing on artist profiles. Updated the `queryArtistOverview` GraphQL persisted query hash to a version that includes `profile.verified` in the response. Redesigned the badge to match Spotify's official "Verified by Spotify" style — a blue flower/seal icon with a white checkmark and "Verified by Spotify" label.
 - **Spotify Library Mutations (`addToLibrary`/`removeFromLibrary`):** Fixed a GraphQL variable naming mismatch across `artist`, `album`, `track`, and `playlist` endpoints where the API expected `libraryItemUris` but the code sent `uris`, causing HTTP 400 errors on follow, unfollow, save, and unsave operations.
 - **Credits Follow Button for Non-Artists:** Fixed an issue where the Follow button appeared for lyricists, composers, and producers in the Track Credits section. Following these non-artist contributors created empty artist pages in the library. The button now only renders for contributors whose roles include "Artist".
+- **Preview Panel Unused Variable Warning:** Removed the unused `profile` variable in `PreviewCarousel.tsx` that caused a TypeScript compiler warning.
+- **Preview Volume Not Persisted Across Tracks:** Fixed a bug where changing the volume in the preview panel had no effect on subsequent tracks — new `Audio` instances now inherit the current `volume` state instead of always defaulting to `0.8`.
+
+#### Changed
+
+- **Preview Panel Layout — Seamless Glass:** The left panel now uses a gradient fade (`rgba(8,8,20,0.82)` → transparent) instead of a hard `border-right` divider, so it blends naturally into the canvas/video side for a fully immersive look.
+- **Preview Ambient Background:** Artwork blur increased to `blur(80px) saturate(2)` for a richer, more vibrant colour-reactive backdrop behind the whole panel.
+- **Preview Canvas Card Styling:** The canvas/video card is now rounded to `16px`, has a layered box-shadow with a purple aura glow, and gets a subtle `scale(1.015)` lift on hover.
+- **Preview Progress Bar Fill:** Changed from a plain white fill to a gradient (`rgba(255,255,255,0.6)` → `#fff`) with a soft glow for a more polished look.
+- **Preview Playlist Name Label:** Restyled to a small uppercase label with `letter-spacing: 2px` for a refined editorial feel, replacing the large bold heading.
+- **Preview Top-Right Spacing:** Gap between cluster elements increased to `8px` with an additional `8px` right margin on the visualizer for clear visual separation from the volume pill.
+- **Preview Artist Row Position:** Moved the artist info row from inside the `preview-track-info` block to the very bottom of the left panel, acting as a pinned bottom-left footer.
+- **Preview Volume Group Styling:** The mute + slider are now wrapped in a frosted glass pill (`backdrop-filter: blur(12px)`, `border: 1px solid rgba(255,255,255,0.1)`) for a cohesive grouped look.
+- **Preview Close Button Integration:** The close button is now part of the `preview-top-right` flex cluster instead of being an independent absolutely-positioned element.
 
 ## [1.0.6] - 2026-07-03
 

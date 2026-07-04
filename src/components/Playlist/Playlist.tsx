@@ -63,6 +63,7 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
     const [isInLocalLibrary, setIsInLocalLibrary] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [previewTracks, setPreviewTracks] = useState<any[]>([]);
+    const lastPreviewPlaylistId = useRef<string | null>(null);
 
                                                                                                 
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -76,7 +77,7 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
     const api = useApi();
 
     const fetchPreviewTracks = async () => {
-        if (previewTracks.length > 0) {
+        if (previewTracks.length > 0 && lastPreviewPlaylistId.current === playlistId) {
             setShowPreview(true);
             return;
         }
@@ -91,16 +92,19 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
             const mapped = tracks.map((track, index) => {
                 const lookup = lookups[index] || {};
                 const previewUrl = lookup?.data?.previews?.audioPreviewsV2?.items?.[0]?.url || null;
+                const firstArtist = Array.isArray(track.artists) && track.artists.length > 0 ? track.artists[0] : null;
                 return {
                     id: track.id,
                     name: track.name,
                     uri: `spotify:track:${track.id}`,
                     image: track.albumArt || '',
                     artists: track.artist ? [track.artist] : [],
+                    artistId: firstArtist?.id || null,
                     previewUrl,
                 };
             }).filter((t) => t.previewUrl);
 
+            lastPreviewPlaylistId.current = playlistId;
             setPreviewTracks(mapped);
             setShowPreview(true);
         } catch (err) {
