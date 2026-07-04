@@ -11,6 +11,7 @@ interface PreviewTrack {
   artistId?: string | null;
   previewUrl?: string;
   duration?: number;
+  playlistIndex?: number;
 }
 
 interface PreviewCarouselProps {

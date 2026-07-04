@@ -101,8 +101,11 @@ const Playlist: React.FC<PlaylistProps> = ({ accessToken: _accessToken, cookies:
                     artists: track.artist ? [track.artist] : [],
                     artistId: firstArtist?.id || null,
                     previewUrl,
+                    playlistIndex: index,
                 };
-            }).filter((t) => t.previewUrl);
+            })
+            .filter((t) => t.previewUrl)
+            .sort((a, b) => a.playlistIndex - b.playlistIndex);
 
             lastPreviewPlaylistId.current = playlistId;
             setPreviewTracks(mapped);
