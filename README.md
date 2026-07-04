@@ -5,7 +5,7 @@
 
   <h1>─── ✧ L U N I Q &nbsp; M U S I C ✧ ───</h1>
 
-  <p>Luniq is an open-source desktop music player made by <b>Saraans</b>. It's not trying to be everything — just the one app you actually want to open when you want to listen to music. We made it because most players feel like they were designed for everyone except you. No fuss, no clutter. Just your music, the way it should be.</p>
+  <p>Luniq is an open-source desktop music player made by <b>Saraans</b>. It's not trying to be everything just the one app you actually want to open when you want to listen to music. We made it because most players feel like they were designed for everyone except you. No fuss, no clutter. Just your music, the way it should be :3</p>
 
   <br />
 
