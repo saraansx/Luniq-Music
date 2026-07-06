@@ -31,10 +31,7 @@
 
 ### / Download
 
-| | |
-| :--- | :--- |
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows8/windows8-original.svg" width="16" height="16" alt="Windows" style="vertical-align: middle;"/> Windows - [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/) | `winget install saraansx.Luniq` |
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows8/windows8-original.svg" width="16" height="16" alt="Windows" style="vertical-align: middle;"/> Windows - [Scoop](https://scoop.sh/) | `scoop bucket add saraansx https://github.com/saraansx/scoop-bucket`<br>`scoop install luniq` |
+
 
 _Or grab the latest setup directly from **[Releases](https://github.com/saraansx/Luniq-Music/releases)**._
 
