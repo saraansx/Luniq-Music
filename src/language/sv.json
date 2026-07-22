@@ -333,5 +333,6 @@
     "about.failedCommits": "Kunde inte ladda historik",
     "about.viewOnGithub": "Visa på GitHub",
     "nowPlaying.writtenBy": "Skriven av",
-    "nowPlaying.producedBy": "Producerad av"
+    "nowPlaying.producedBy": "Producerad av",
+    "nowPlaying.credits": "Lista över medverkande"
 }
