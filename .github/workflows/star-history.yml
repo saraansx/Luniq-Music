@@ -1,21 +1,33 @@
-name: Star History
+name: Star History Generator
 
 on:
   schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch: 
+    - cron: '0 0 * * *' # Runs daily at midnight UTC
+  workflow_dispatch: # Allows manual trigger anytime from GitHub Actions tab
 
 permissions:
   contents: write
 
 jobs:
-  star-history:
+  update-star-history:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate Star History Chart
-        uses: narayann7/star-history-action@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          repos: ${{ github.repository }}
+          node-version: 20
+
+      - name: Generate Star History SVG
+        run: node scripts/generate-star-history.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and push if updated
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/assets/star-history.svg
+          git diff --staged --quiet || (git commit -m "chore: auto-update star history chart [skip ci]" && git push)
