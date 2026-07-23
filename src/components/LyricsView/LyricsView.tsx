@@ -54,11 +54,10 @@ const LyricsView: React.FC = () => {
                     const romLines = data.romanizedLyrics ? parseSyncedLyrics(data.romanizedLyrics) : [];
                     const merged = mainLines.map(line => {
                         const matchingRom = romLines.find(r => Math.abs(r.time - line.time) < 0.8);
-                        const cleanMain = line.text.toLowerCase().replace(/[^a-z0-9]/g, '');
-                        const cleanRom = matchingRom ? matchingRom.text.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+                        const hasNonLatin = /[^\x00-\x7F]/.test(line.text);
                         return {
                             ...line,
-                            romanizedText: (matchingRom && cleanMain !== cleanRom) ? matchingRom.text : undefined
+                            romanizedText: (hasNonLatin && matchingRom && matchingRom.text !== line.text) ? matchingRom.text : undefined
                         };
                     });
                     setLyrics(merged);
@@ -68,12 +67,11 @@ const LyricsView: React.FC = () => {
                     const romLines = data.romanizedLyrics ? data.romanizedLyrics.split('\n') : [];
                     const merged = mainLines.map((text, idx) => {
                         const matchingRom = romLines[idx];
-                        const cleanMain = text.toLowerCase().replace(/[^a-z0-9]/g, '');
-                        const cleanRom = matchingRom ? matchingRom.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+                        const hasNonLatin = /[^\x00-\x7F]/.test(text);
                         return {
                             time: 0,
                             text,
-                            romanizedText: (matchingRom && cleanMain !== cleanRom) ? matchingRom : undefined
+                            romanizedText: (hasNonLatin && matchingRom && matchingRom !== text) ? matchingRom : undefined
                         };
                     });
                     setLyrics(merged);
@@ -160,7 +158,8 @@ const LyricsView: React.FC = () => {
                                     data-index={index}
                                     className={isSynced ? `lyric-line ${isActive ? 'active' : ''} ${hasRom ? 'has-romanized' : ''}` : `lyric-line-static ${hasRom ? 'has-romanized' : ''}`}
                                 >
-                                    <div className="lyric-main-text">{line.romanizedText || line.text}</div>
+                                    <div className="lyric-main-text">{line.text}</div>
+                                    {hasRom && <div className="lyric-romanized-text">{line.romanizedText}</div>}
                                 </div>
                             );
                         })}
