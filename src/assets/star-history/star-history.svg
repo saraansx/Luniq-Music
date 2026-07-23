@@ -22,7 +22,6 @@
   <rect width="800" height="420" class="bg" />
 
   <!-- Y-Axis Grid & Labels -->
-  <!-- Y Range: 0 to 120, height: 260px (y=70 to y=330) -->
   <line x1="90" y1="330" x2="740" y2="330" class="grid" />
   <text x="75" y="334" text-anchor="end" class="axis-text">0</text>
 
@@ -45,7 +44,6 @@
   <text x="75" y="74" text-anchor="end" class="axis-text">120</text>
 
   <!-- X-Axis Labels -->
-  <!-- X Range: Mar 15 to Jul 25, width: 650px (x=90 to x=740) -->
   <text x="130" y="360" text-anchor="middle" class="axis-text">Mar</text>
   <text x="270" y="360" text-anchor="middle" class="axis-text">Apr</text>
   <text x="410" y="360" text-anchor="middle" class="axis-text">May</text>

@@ -97,7 +97,7 @@ Enjoying Luniq? Consider giving us a ⭐ to support the development and join our
 ### / Engagement
 
 <!--START_SECTION:star-history-->
-[![Star History Chart](src/assets/star-history.svg)](https://www.star-history.com/?type=date&repos=saraansx%2FLuniq-Music)
+[![Star History Chart](src/assets/star-history/star-history.svg)](https://www.star-history.com/?type=date&repos=saraansx%2FLuniq-Music)
 <!--END_SECTION:star-history-->
 
 <br />

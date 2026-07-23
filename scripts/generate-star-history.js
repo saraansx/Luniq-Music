@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 async function generateStarHistory() {
   const token = process.env.GITHUB_TOKEN;
@@ -121,8 +121,12 @@ async function generateStarHistory() {
   <text x="740" y="390" text-anchor="end" class="watermark">star-history</text>
 </svg>`;
 
-  fs.writeFileSync('src/assets/star-history.svg', svg);
-  console.log('Successfully generated src/assets/star-history.svg!');
+  const outDir = 'src/assets/star-history';
+  if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir, { recursive: true });
+  }
+  fs.writeFileSync(`${outDir}/star-history.svg`, svg);
+  console.log('Successfully generated src/assets/star-history/star-history.svg!');
 }
 
 generateStarHistory();
