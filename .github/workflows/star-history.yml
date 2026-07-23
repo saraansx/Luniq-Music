@@ -1,0 +1,21 @@
+name: Star History
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch: 
+
+permissions:
+  contents: write
+
+jobs:
+  star-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate Star History Chart
+        uses: narayann7/star-history-action@v1
+        with:
+          repos: ${{ github.repository }}
