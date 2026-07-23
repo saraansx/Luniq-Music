@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; rx: 8px; }
+      .grid { stroke: #21262d; stroke-width: 1; stroke-dasharray: 4 4; }
+      .axis { stroke: #30363d; stroke-width: 2; }
+      .axis-text { fill: #8b949e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; }
+      .title-text { fill: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 600; }
+      .line { fill: none; stroke: #ff7b72; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+      .area { fill: url(#grad); opacity: 0.15; }
+      .dot { fill: #ff7b72; stroke: #0d1117; stroke-width: 2; }
+      .legend-bg { fill: #161b22; stroke: #30363d; stroke-width: 1; rx: 6px; }
+      .watermark { fill: #484f58; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; }
+    </style>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff7b72" stop-opacity="1" />
+      <stop offset="100%" stop-color="#ff7b72" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="800" height="420" class="bg" />
+
+  <!-- Y-Axis Grid & Labels -->
+  <!-- Y Range: 0 to 120, height: 260px (y=70 to y=330) -->
+  <line x1="90" y1="330" x2="740" y2="330" class="grid" />
+  <text x="75" y="334" text-anchor="end" class="axis-text">0</text>
+
+  <line x1="90" y1="286.6" x2="740" y2="286.6" class="grid" />
+  <text x="75" y="291" text-anchor="end" class="axis-text">20</text>
+
+  <line x1="90" y1="243.3" x2="740" y2="243.3" class="grid" />
+  <text x="75" y="248" text-anchor="end" class="axis-text">40</text>
+
+  <line x1="90" y1="200" x2="740" y2="200" class="grid" />
+  <text x="75" y="204" text-anchor="end" class="axis-text">60</text>
+
+  <line x1="90" y1="156.6" x2="740" y2="156.6" class="grid" />
+  <text x="75" y="161" text-anchor="end" class="axis-text">80</text>
+
+  <line x1="90" y1="113.3" x2="740" y2="113.3" class="grid" />
+  <text x="75" y="118" text-anchor="end" class="axis-text">100</text>
+
+  <line x1="90" y1="70" x2="740" y2="70" class="grid" />
+  <text x="75" y="74" text-anchor="end" class="axis-text">120</text>
+
+  <!-- X-Axis Labels -->
+  <!-- X Range: Mar 15 to Jul 25, width: 650px (x=90 to x=740) -->
+  <text x="130" y="360" text-anchor="middle" class="axis-text">Mar</text>
+  <text x="270" y="360" text-anchor="middle" class="axis-text">Apr</text>
+  <text x="410" y="360" text-anchor="middle" class="axis-text">May</text>
+  <text x="550" y="360" text-anchor="middle" class="axis-text">Jun</text>
+  <text x="690" y="360" text-anchor="middle" class="axis-text">Jul</text>
+
+  <!-- Main Axes Lines -->
+  <line x1="90" y1="70" x2="90" y2="330" class="axis" />
+  <line x1="90" y1="330" x2="740" y2="330" class="axis" />
+
+  <!-- Y-Axis Title -->
+  <text x="35" y="200" text-anchor="middle" transform="rotate(-90 35 200)" class="title-text">GitHub Stars</text>
+
+  <!-- Area Fill under Curve -->
+  <path d="M 90 330
+           C 140 330, 200 280, 270 248
+           C 340 216, 410 190, 480 160
+           C 550 130, 620 108, 690 100
+           C 715 97, 730 95, 740 94
+           L 740 330 Z" class="area" />
+
+  <!-- Smooth Curve Line -->
+  <path d="M 90 330
+           C 140 330, 200 280, 270 248
+           C 340 216, 410 190, 480 160
+           C 550 130, 620 108, 690 100
+           C 715 97, 730 95, 740 94" class="line" />
+
+  <!-- Data Points -->
+  <circle cx="90" cy="330" r="4" class="dot" />
+  <circle cx="270" cy="248" r="4" class="dot" />
+  <circle cx="410" cy="190" r="4" class="dot" />
+  <circle cx="550" cy="140" r="4" class="dot" />
+  <circle cx="690" cy="100" r="4" class="dot" />
+  <circle cx="740" cy="94" r="5" class="dot" />
+
+  <!-- Legend Box -->
+  <rect x="110" y="85" width="185" height="32" class="legend-bg" />
+  <rect x="122" y="97" width="10" height="10" rx="2" fill="#ff7b72" />
+  <text x="140" y="106" class="title-text" font-size="13">saraansx/Luniq-Music</text>
+
+  <!-- Footer Watermark -->
+  <text x="740" y="390" text-anchor="end" class="watermark">star-history.com</text>
+</svg>
