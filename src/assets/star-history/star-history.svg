@@ -18,73 +18,44 @@
     </linearGradient>
   </defs>
 
-  <!-- Background Card -->
   <rect width="800" height="420" class="bg" />
 
-  <!-- Y-Axis Grid & Labels -->
-  <line x1="90" y1="330" x2="740" y2="330" class="grid" />
-  <text x="75" y="334" text-anchor="end" class="axis-text">0</text>
+  
+      <line x1="90" y1="330.0" x2="740" y2="330.0" class="grid" opacity="0.6" />
+      <text x="75" y="334.0" text-anchor="end" class="axis-text">0</text>
+    
+      <line x1="90" y1="286.7" x2="740" y2="286.7" class="grid" opacity="0.6" />
+      <text x="75" y="290.7" text-anchor="end" class="axis-text">20</text>
+    
+      <line x1="90" y1="243.3" x2="740" y2="243.3" class="grid" opacity="0.6" />
+      <text x="75" y="247.3" text-anchor="end" class="axis-text">40</text>
+    
+      <line x1="90" y1="200.0" x2="740" y2="200.0" class="grid" opacity="0.6" />
+      <text x="75" y="204.0" text-anchor="end" class="axis-text">60</text>
+    
+      <line x1="90" y1="156.7" x2="740" y2="156.7" class="grid" opacity="0.6" />
+      <text x="75" y="160.7" text-anchor="end" class="axis-text">80</text>
+    
+      <line x1="90" y1="113.3" x2="740" y2="113.3" class="grid" opacity="0.6" />
+      <text x="75" y="117.3" text-anchor="end" class="axis-text">100</text>
+    
+      <line x1="90" y1="70.0" x2="740" y2="70.0" class="grid" opacity="0.6" />
+      <text x="75" y="74.0" text-anchor="end" class="axis-text">120</text>
+    
 
-  <line x1="90" y1="286.6" x2="740" y2="286.6" class="grid" />
-  <text x="75" y="291" text-anchor="end" class="axis-text">20</text>
-
-  <line x1="90" y1="243.3" x2="740" y2="243.3" class="grid" />
-  <text x="75" y="248" text-anchor="end" class="axis-text">40</text>
-
-  <line x1="90" y1="200" x2="740" y2="200" class="grid" />
-  <text x="75" y="204" text-anchor="end" class="axis-text">60</text>
-
-  <line x1="90" y1="156.6" x2="740" y2="156.6" class="grid" />
-  <text x="75" y="161" text-anchor="end" class="axis-text">80</text>
-
-  <line x1="90" y1="113.3" x2="740" y2="113.3" class="grid" />
-  <text x="75" y="118" text-anchor="end" class="axis-text">100</text>
-
-  <line x1="90" y1="70" x2="740" y2="70" class="grid" />
-  <text x="75" y="74" text-anchor="end" class="axis-text">120</text>
-
-  <!-- X-Axis Labels -->
-  <text x="130" y="360" text-anchor="middle" class="axis-text">Mar</text>
-  <text x="270" y="360" text-anchor="middle" class="axis-text">Apr</text>
-  <text x="410" y="360" text-anchor="middle" class="axis-text">May</text>
-  <text x="550" y="360" text-anchor="middle" class="axis-text">Jun</text>
-  <text x="690" y="360" text-anchor="middle" class="axis-text">Jul</text>
-
-  <!-- Main Axes Lines -->
   <line x1="90" y1="70" x2="90" y2="330" class="axis" />
   <line x1="90" y1="330" x2="740" y2="330" class="axis" />
 
-  <!-- Y-Axis Title -->
   <text x="35" y="200" text-anchor="middle" transform="rotate(-90 35 200)" class="title-text">GitHub Stars</text>
 
-  <!-- Area Fill under Curve -->
-  <path d="M 90 330
-           C 140 330, 200 280, 270 248
-           C 340 216, 410 190, 480 160
-           C 550 130, 620 108, 690 100
-           C 715 97, 730 95, 740 94
-           L 740 330 Z" class="area" />
+  <path d="M 90 330 L 90.0 327.8 L 91.3 319.2 L 103.3 310.5 L 111.5 301.8 L 118.9 293.2 L 132.4 284.5 L 144.5 275.8 L 172.7 267.2 L 201.1 258.5 L 218.2 249.8 L 244.2 241.2 L 266.0 232.5 L 308.9 223.8 L 329.9 215.2 L 340.6 206.5 L 363.7 197.8 L 385.6 189.2 L 411.9 180.5 L 446.0 171.8 L 467.9 163.2 L 504.0 154.5 L 551.9 145.8 L 558.5 137.2 L 589.3 128.5 L 628.8 119.8 L 651.0 111.2 L 728.9 102.5 L 731.6 100.3 L 740.0 100.3 L 740.0 330 Z" class="area" />
+  <path d="M 90 330 L 90.0 327.8 L 91.3 319.2 L 103.3 310.5 L 111.5 301.8 L 118.9 293.2 L 132.4 284.5 L 144.5 275.8 L 172.7 267.2 L 201.1 258.5 L 218.2 249.8 L 244.2 241.2 L 266.0 232.5 L 308.9 223.8 L 329.9 215.2 L 340.6 206.5 L 363.7 197.8 L 385.6 189.2 L 411.9 180.5 L 446.0 171.8 L 467.9 163.2 L 504.0 154.5 L 551.9 145.8 L 558.5 137.2 L 589.3 128.5 L 628.8 119.8 L 651.0 111.2 L 728.9 102.5 L 731.6 100.3 L 740.0 100.3" class="line" />
 
-  <!-- Smooth Curve Line -->
-  <path d="M 90 330
-           C 140 330, 200 280, 270 248
-           C 340 216, 410 190, 480 160
-           C 550 130, 620 108, 690 100
-           C 715 97, 730 95, 740 94" class="line" />
+  <circle cx="740.0" cy="100.3" r="5" class="dot" />
 
-  <!-- Data Points -->
-  <circle cx="90" cy="330" r="4" class="dot" />
-  <circle cx="270" cy="248" r="4" class="dot" />
-  <circle cx="410" cy="190" r="4" class="dot" />
-  <circle cx="550" cy="140" r="4" class="dot" />
-  <circle cx="690" cy="100" r="4" class="dot" />
-  <circle cx="740" cy="94" r="5" class="dot" />
-
-  <!-- Legend Box -->
   <rect x="110" y="85" width="185" height="32" class="legend-bg" />
   <rect x="122" y="97" width="10" height="10" rx="2" fill="#ff7b72" />
   <text x="140" y="106" class="title-text" font-size="13">saraansx/Luniq-Music</text>
 
-  <!-- Footer Watermark -->
-  <text x="740" y="390" text-anchor="end" class="watermark">star-history.com</text>
+  <text x="740" y="390" text-anchor="end" class="watermark">star-history</text>
 </svg>
