@@ -467,18 +467,22 @@ export class LuniqSpatialEngine {
 
     this.isEngaged = true;
 
-    // 1. Dynamic 3-Stage Psychoacoustic Bass Sculptor
+    // 1. Dynamic 3-Stage Psychoacoustic Bass Sculptor (Full user control preservation)
     const bass = Math.max(0, Math.min(12, config.bassBoost || 0));
     // Sub-Infrasonic 42Hz core (rumble depth)
-    this.subBassInfrasonicFilter.gain.setTargetAtTime(bass * 0.85, time, ramp);
+    const infrasonicGain = config.mode === 'studio' ? bass * 0.90 : bass * 1.0;
+    this.subBassInfrasonicFilter.gain.setTargetAtTime(infrasonicGain, time, ramp);
     // Punch 85Hz kick snap (transient chest impact)
-    this.punchBassFilter.gain.setTargetAtTime(bass * 0.55, time, ramp);
+    const punchGain = config.mode === 'studio' ? bass * 0.70 : bass * 0.75;
+    this.punchBassFilter.gain.setTargetAtTime(punchGain, time, ramp);
     // Psychoacoustic MaxxBass 165Hz harmonics (rich body perceptible on any headphone/speaker)
-    this.harmonicBassFilter.gain.setTargetAtTime(bass * 0.35, time, ramp);
+    const harmonicGain = config.mode === 'studio' ? bass * 0.40 : bass * 0.50;
+    this.harmonicBassFilter.gain.setTargetAtTime(harmonicGain, time, ramp);
 
     // 2. Vocal Clarity Presence (3.2kHz Pinna concha ear-canal articulation)
     const vocal = Math.max(0, Math.min(8, config.vocalClarity || 0));
-    this.vocalFilter.gain.setTargetAtTime(vocal, time, ramp);
+    const vocalGain = config.mode === 'studio' ? vocal * 0.85 : vocal * 1.0;
+    this.vocalFilter.gain.setTargetAtTime(vocalGain, time, ramp);
 
     // 3. Soundstage Width Expander (1.0 = Normal, 1.35 = Wide, 2.0+ = Ultra-Wide)
     const width = Math.max(1.0, Math.min(2.2, config.spatialWidth || 1.35));
@@ -486,19 +490,20 @@ export class LuniqSpatialEngine {
     this.midGain.gain.setTargetAtTime(midCoeff, time, ramp);
     this.sideGain.gain.setTargetAtTime(width, time, ramp);
 
-    // 4. Independent Binaural Crossfeed
+    // 4. Independent Binaural Crossfeed (Natural acoustic speaker simulation)
     if (config.crossfeed) {
-      this.crossfeedGainLtoR.gain.setTargetAtTime(0.15, time, ramp);
-      this.crossfeedGainRtoL.gain.setTargetAtTime(0.15, time, ramp);
+      const crossGain = config.mode === 'studio' ? 0.22 : 0.25;
+      this.crossfeedGainLtoR.gain.setTargetAtTime(crossGain, time, ramp);
+      this.crossfeedGainRtoL.gain.setTargetAtTime(crossGain, time, ramp);
     } else {
       this.crossfeedGainLtoR.gain.setTargetAtTime(0, time, ramp);
       this.crossfeedGainRtoL.gain.setTargetAtTime(0, time, ramp);
     }
 
-    // 5. Analog Tube Warmth
+    // 5. Analog Tube Warmth (Rich 2nd order harmonic saturation)
     if (config.tubeWarmth) {
-      this.saturationWetGain.gain.setTargetAtTime(0.25, time, ramp);
-      this.saturationDryGain.gain.setTargetAtTime(0.85, time, ramp);
+      this.saturationWetGain.gain.setTargetAtTime(0.35, time, ramp);
+      this.saturationDryGain.gain.setTargetAtTime(0.80, time, ramp);
     } else {
       this.saturationWetGain.gain.setTargetAtTime(0, time, ramp);
       this.saturationDryGain.gain.setTargetAtTime(1.0, time, ramp);
@@ -514,42 +519,24 @@ export class LuniqSpatialEngine {
 
     if (config.mode === 'studio') {
       // Studio Reference Acoustic Monitor (Acoustically Treated Mastering Suite)
-      this.subBassInfrasonicFilter.gain.setTargetAtTime(bass * 0.50, time, ramp);
-      this.punchBassFilter.gain.setTargetAtTime(bass * 0.40, time, ramp);
-      this.harmonicBassFilter.gain.setTargetAtTime(bass * 0.25, time, ramp);
-      this.vocalFilter.gain.setTargetAtTime(vocal * 0.60, time, ramp);
-      modeAir = 1.4;
-      modeWet = 0.06 * (config.reverbMix ?? 1);
-      modeDry = 0.99;
-      this.sideGain.gain.setTargetAtTime(Math.min(width, 1.18), time, ramp);
-      this.midGain.gain.setTargetAtTime(1.0, time, ramp);
-      this.crossfeedGainLtoR.gain.setTargetAtTime(0.18, time, ramp);
-      this.crossfeedGainRtoL.gain.setTargetAtTime(0.18, time, ramp);
+      modeAir = 1.8;
+      modeWet = 0.16 * (config.reverbMix ?? 1);
+      modeDry = 0.94;
     } else if (config.mode === 'audiophile') {
       // Audiophile Hi-Fi Holographic (Transparent Natural Timbre)
-      this.subBassInfrasonicFilter.gain.setTargetAtTime(Math.max(bass * 0.65, 2.0), time, ramp);
-      this.punchBassFilter.gain.setTargetAtTime(Math.max(bass * 0.50, 1.6), time, ramp);
-      this.harmonicBassFilter.gain.setTargetAtTime(Math.max(bass * 0.30, 0.8), time, ramp);
-      this.vocalFilter.gain.setTargetAtTime(Math.max(vocal * 0.70, 1.8), time, ramp);
-      modeAir = 2.6;
-      modeWet = 0.07 * (config.reverbMix ?? 1);
-      modeDry = 0.99;
-      this.sideGain.gain.setTargetAtTime(width * 1.16, time, ramp);
-      this.midGain.gain.setTargetAtTime(midCoeff * 1.02, time, ramp);
-      this.crossfeedGainLtoR.gain.setTargetAtTime(0.20, time, ramp);
-      this.crossfeedGainRtoL.gain.setTargetAtTime(0.20, time, ramp);
+      modeAir = 3.2;
+      modeWet = 0.22 * (config.reverbMix ?? 1);
+      modeDry = 0.90;
     }
 
     this.airFilter.gain.setTargetAtTime(modeAir, time, ramp);
     this.convolverMasterGain.gain.setTargetAtTime(modeWet, time, ramp);
     this.dryGain.gain.setTargetAtTime(modeDry, time, ramp);
 
-    // 7. Continuous Dynamic Headroom Auto-Trim (Prevents Limiter Pumping & Inter-Sample Overs)
-    const totalBoostDb = (bass * 0.55) + (vocal * 0.35) + (modeAir * 0.40) + 
-      (width > 1.35 ? (width - 1.35) * 3.5 : 0) + 
-      (config.tubeWarmth ? 1.2 : 0);
-    const trimLinear = Math.pow(10, -(totalBoostDb * 0.18) / 20);
-    this.headroomTrimGain.gain.setTargetAtTime(Math.min(1.0, Math.max(0.40, trimLinear)), time, ramp);
+    // 7. Continuous Dynamic Headroom Auto-Trim (Transparent headroom management without killing bass punch)
+    const totalBoostDb = (bass * 0.35) + (vocal * 0.20) + (modeAir * 0.20);
+    const trimLinear = Math.pow(10, -(totalBoostDb * 0.10) / 20);
+    this.headroomTrimGain.gain.setTargetAtTime(Math.min(1.0, Math.max(0.70, trimLinear)), time, ramp);
   }
 
   /**

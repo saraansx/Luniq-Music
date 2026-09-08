@@ -33,9 +33,30 @@ export class AudioCacheManager {
             if (!fs.existsSync(this.cacheDir)) {
                 fs.mkdirSync(this.cacheDir, { recursive: true });
             }
+            this.cleanupOrphanedTmpFiles();
         } catch (err) {
             console.error('[AudioCache] Failed to create audio-cache dir:', err);
         }
+    }
+
+    private cleanupOrphanedTmpFiles() {
+        try {
+            const files = fs.readdirSync(this.cacheDir);
+            const now = Date.now();
+            for (const file of files) {
+                if (file.endsWith('.tmp')) {
+                    const fullPath = path.join(this.cacheDir, file);
+                    try {
+                        const stats = fs.statSync(fullPath);
+                        // Clean up .tmp files older than 5 minutes that aren't actively being written
+                        if (now - stats.mtimeMs > 5 * 60 * 1000) {
+                            fs.unlinkSync(fullPath);
+                            console.log(`[AudioCache] Cleaned up stale temporary cache file: ${file}`);
+                        }
+                    } catch (_) {}
+                }
+            }
+        } catch (_) {}
     }
 
     public getCacheDir(): string {

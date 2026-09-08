@@ -59,14 +59,11 @@ export interface SpotifySecrets {
 
 export class SpotifyAuthCore {
     /**
-     * Community-maintained endpoints for TOTP secrets with fallback URLs.
+     * Internal TOTP secrets handling without external GitHub dependencies.
      */
-    private secretsUrls = [
-        'https://gist.githubusercontent.com/saraansx/a622d4c1a12c36afdcf701201e9482a3/raw/nuance.json',
-        'https://raw.githubusercontent.com/Thereallo1026/spotify-secrets/main/secrets.json',
-    ];
+    private secretsUrls: string[] = [];
 
-    // Built-in hardcoded fallback secret in case network sources are unavailable
+    // Built-in fallback secret for Spotify TOTP generation
     private fallbackSecret: SpotifySecrets = {
         version: '61',
         secret: base32Decode('GM3TMMJTGYZTQNZVGM4DINJZHA4TGOBYGMZTCMRTGEYDSMJRHE4TEOBUG4YTCMRUGQ4DQOJUGQYTAMRRGA2TCMJSHE3TCMBY'),

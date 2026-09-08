@@ -123,6 +123,7 @@ const PlayerBar: React.FC<{
       sourceRef.current = source;
 
       const gainNode = audioCtx.createGain();
+      gainNode.gain.value = isMuted ? 0 : Math.max(0, Math.min(1, volume));
       gainNodeRef.current = gainNode;
 
       const analyzer = audioCtx.createAnalyser();
@@ -197,20 +198,25 @@ const PlayerBar: React.FC<{
   // Dynamic DSP Parameter Automation (Glitchless transition in/out of 3D spatial mode)
   useEffect(() => {
     if (spatialEngineRef.current && audioCtxRef.current) {
+      const apply = () => {
+        spatialEngineRef.current?.applyConfig({
+          enabled: spatialAudioEnabled,
+          mode: spatialAudioMode,
+          bassBoost: spatialBassBoost,
+          vocalClarity: spatialVocalClarity,
+          tubeWarmth: spatialTubeWarmth,
+          crossfeed: true,
+          spatialWidth: spatialWidth || 1.4,
+          roomSize: spatialRoomSize || 'medium',
+          reverbMix: 1.0,
+        });
+      };
+
       if (audioCtxRef.current.state === "suspended") {
-        audioCtxRef.current.resume().catch(() => {});
+        audioCtxRef.current.resume().then(apply).catch(() => apply());
+      } else {
+        apply();
       }
-      spatialEngineRef.current.applyConfig({
-        enabled: spatialAudioEnabled,
-        mode: spatialAudioMode,
-        bassBoost: spatialBassBoost,
-        vocalClarity: spatialVocalClarity,
-        tubeWarmth: spatialTubeWarmth,
-        crossfeed: true,
-        spatialWidth: spatialWidth || 1.4,
-        roomSize: spatialRoomSize || 'medium',
-        reverbMix: 1.0,
-      });
     }
   }, [spatialAudioEnabled, spatialAudioMode, spatialWidth, spatialRoomSize, spatialBassBoost, spatialVocalClarity, spatialTubeWarmth]);
 
@@ -1529,6 +1535,25 @@ const PlayerBar: React.FC<{
             if (currentTime > 0) {
               audioRef.current.currentTime = currentTime;
             }
+          }
+        }}
+        onWaiting={() => {
+          // If waiting for buffer during playback, attempt recovery if stalled for > 5s
+          if (isPlaying && audioRef.current && !audioRef.current.paused) {
+            const stalledAt = audioRef.current.currentTime;
+            setTimeout(() => {
+              if (
+                audioRef.current &&
+                isPlaying &&
+                audioRef.current.readyState < 3 &&
+                Math.abs(audioRef.current.currentTime - stalledAt) < 0.1
+              ) {
+                console.warn(`[PlayerBar] Audio buffer stalled at ${stalledAt.toFixed(1)}s, attempting resume...`);
+                audioRef.current.load();
+                audioRef.current.currentTime = stalledAt;
+                audioRef.current.play().catch(() => {});
+              }
+            }, 5000);
           }
         }}
         onCanPlay={() => {

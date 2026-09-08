@@ -60,7 +60,8 @@ function matchesDuration(
 ): boolean {
   if (expectedDurationSeconds <= 0) return true;
   if (candidateDurationSeconds <= 0) return true;
-  const tolerance = Math.max(15, (expectedDurationSeconds * 10) / 100);
+  // Maximum tolerance of ±12 seconds or 5% of track duration, whichever is greater
+  const tolerance = Math.max(12, (expectedDurationSeconds * 5) / 100);
   return (
     Math.abs(candidateDurationSeconds - expectedDurationSeconds) <= tolerance
   );

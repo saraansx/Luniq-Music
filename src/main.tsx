@@ -51,10 +51,10 @@ const SearchView = React.lazy(() => import('./components/SearchView/SearchView')
 const NowPlayingView = React.lazy(() => import('./components/NowPlayingView/NowPlayingView'));
 const QueueView = React.lazy(() => import('./components/QueueView/QueueView'));
 const LyricsView = React.lazy(() => import('./components/LyricsView/LyricsView'));
-const Settings = React.lazy(() => import('./Settings/settings/Settings'));
+import Settings from './Settings/settings/Settings';
 import updatesImg from './assets/Updates.png';
 import mainLogo from './assets/Main.png';
-import { HomeSkeleton, SettingsSkeleton } from './components/Skeleton/Skeleton';
+import { HomeSkeleton } from './components/Skeleton/Skeleton';
 
 const MiniPlayerView = React.lazy(() => import('./components/MiniPlayer/MiniPlayerView'));
 const FloatingLyrics = React.lazy(() => import('./components/FloatingLyrics/FloatingLyrics'));
@@ -315,9 +315,7 @@ const MainLayout = ({
                     onPlaylistSelect={handlePlaylistSelect}
                   />
                 ) : view === 'settings' ? (
-                  <React.Suspense fallback={<SettingsSkeleton />}>
-                    <Settings accessToken={credentials?.accessToken} cookies={credentials?.cookies} isClosing={isSettingsClosing} />
-                  </React.Suspense>
+                  <Settings accessToken={credentials?.accessToken} cookies={credentials?.cookies} isClosing={isSettingsClosing} />
                 ) : (
                   selectedPlaylistId && (
                     <Playlist

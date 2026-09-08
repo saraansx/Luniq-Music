@@ -122,7 +122,8 @@ const proxyServer = http.createServer((req, res) => {
   }
 
   const controller = new AbortController();
-  req.on('close', () => controller.abort());
+  // Note: Do NOT abort fetch controller immediately on req 'close' if we are caching track from start 0
+  // Instead, let background caching continue so seeking / range requests have the full audio in local cache.
 
   globalThis.fetch(cleanTargetUrl, {
     headers,
@@ -153,7 +154,9 @@ const proxyServer = http.createServer((req, res) => {
       const cRange = targetRes.headers.get('content-range');
       if (cRange) resHeaders['Content-Range'] = cRange;
 
-      res.writeHead(targetRes.status, resHeaders);
+      if (!res.headersSent) {
+        res.writeHead(targetRes.status, resHeaders);
+      }
 
       // Progressive cache writer if streaming from the beginning (start === 0) and response is valid audio
       const isValidAudioResponse = (targetRes.status === 200 || targetRes.status === 206) && !mimeType.includes('text/html') && !mimeType.includes('application/json');
@@ -164,18 +167,18 @@ const proxyServer = http.createServer((req, res) => {
 
       if (targetRes.body) {
         const reader = targetRes.body.getReader();
-        let isClosed = false;
+        let clientClosed = false;
 
         req.on('close', () => {
-          isClosed = true;
-          reader.cancel().catch(() => {});
+          clientClosed = true;
+          // If we are not actively caching to disk, cancel upstream immediately to save bandwidth
+          if (!cacheWriter) {
+            controller.abort();
+            reader.cancel().catch(() => {});
+          }
         });
 
         const pump = async () => {
-          if (isClosed) {
-            cacheWriter?.abort();
-            return;
-          }
           const { done, value } = await reader.read();
           if (done) {
             cacheWriter?.commit();
@@ -184,7 +187,7 @@ const proxyServer = http.createServer((req, res) => {
           }
           if (value) {
             cacheWriter?.write(value);
-            if (!res.writableEnded) {
+            if (!clientClosed && !res.writableEnded) {
               const canContinue = res.write(value);
               if (!canContinue) {
                 res.once('drain', pump);
@@ -195,7 +198,7 @@ const proxyServer = http.createServer((req, res) => {
           await pump();
         };
         pump().catch((err) => {
-          if (err.name === 'AbortError' || err.message?.includes('aborted') || isClosed) {
+          if (err.name === 'AbortError' || err.message?.includes('aborted')) {
             cacheWriter?.abort();
             return;
           }

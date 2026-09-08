@@ -48,6 +48,13 @@ export interface StoreSchema {
     };
     gaplessEnabled?: boolean;
     crossfadeDuration?: number;
+    spatialAudioEnabled?: boolean;
+    spatialAudioMode?: 'off' | 'audiophile' | 'studio';
+    spatialBassBoost?: number;
+    spatialVocalClarity?: number;
+    spatialTubeWarmth?: boolean;
+    spatialWidth?: number;
+    spatialRoomSize?: 'small' | 'medium';
 }
 
 export const schema = {
@@ -83,6 +90,13 @@ export const schema = {
         items: { type: 'number' },
         default: [0, 0, 0, 0, 0]
     },
+    spatialAudioEnabled: { type: 'boolean', default: false },
+    spatialAudioMode: { type: 'string', default: 'audiophile' },
+    spatialBassBoost: { type: 'number', default: 4 },
+    spatialVocalClarity: { type: 'number', default: 3 },
+    spatialTubeWarmth: { type: 'boolean', default: true },
+    spatialWidth: { type: 'number', default: 1.4 },
+    spatialRoomSize: { type: 'string', default: 'medium' },
     closeBehavior: { type: 'string', default: 'minimize' },
     discordRPC: { type: 'boolean', default: true },
     autoUpdateYtdlp: { type: 'boolean', default: true },

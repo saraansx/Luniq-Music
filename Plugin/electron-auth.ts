@@ -50,7 +50,16 @@ export class ElectronSpotifyAuth {
       loginWindow.setMenuBarVisibility(false);
       loginWindow.webContents.setUserAgent(firefoxUA);
 
+      let pollInterval: NodeJS.Timeout | null = null;
+
       const cleanup = () => {
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
+        }
+        try {
+          loginSession.cookies.removeListener('changed', cookieListener);
+        } catch {}
         try {
           if (!loginWindow.isDestroyed()) {
             if (loginWindow.webContents.debugger.isAttached()) {
@@ -61,14 +70,17 @@ export class ElectronSpotifyAuth {
         } catch {}
       };
 
-      const finishWithCredentials = async (accessToken: string, expiration?: number) => {
+      const finishWithCredentials = async (accessToken: string, expiration?: number, existingCookies?: Electron.Cookie[]) => {
         if (resolved) return;
         resolved = true;
 
         try {
-          const cookies = await loginSession.cookies.get({ domain: "spotify.com" });
+          const cookies = (existingCookies && existingCookies.length > 0)
+            ? existingCookies
+            : await loginSession.cookies.get({});
+          const spotifyCookies = cookies.filter((c) => c.domain?.includes("spotify.com"));
           const credentials: SpotifyCredentials = {
-            cookies,
+            cookies: spotifyCookies.length > 0 ? spotifyCookies : cookies,
             accessToken,
             expiration: expiration || Date.now() + 3600 * 1000,
           };
@@ -80,41 +92,38 @@ export class ElectronSpotifyAuth {
         }
       };
 
-      let debuggerAttached = false;
-      const attachDebuggerOnSpotify = () => {
-        if (debuggerAttached || resolved) return;
-        try {
-          loginWindow.webContents.debugger.attach("1.3");
-          loginWindow.webContents.debugger.sendCommand("Network.enable");
-          debuggerAttached = true;
+      // ── Layer 1: DevTools Debugger (attached immediately before loadURL) ──
+      try {
+        loginWindow.webContents.debugger.attach("1.3");
+        loginWindow.webContents.debugger.sendCommand("Network.enable");
 
-          loginWindow.webContents.debugger.on("message", async (_event, method, params) => {
-            if (resolved) return;
+        loginWindow.webContents.debugger.on("message", async (_event, method, params) => {
+          if (resolved) return;
 
-            if (method === "Network.responseReceived") {
-              const url = params?.response?.url || "";
-              if (url.includes("/api/token") || url.includes("/get_access_token")) {
-                try {
-                  const res = await loginWindow.webContents.debugger.sendCommand("Network.getResponseBody", {
-                    requestId: params.requestId,
-                  });
-                  if (res?.body) {
-                    const data = JSON.parse(res.body);
-                    if (data?.accessToken && !data.isAnonymous) {
-                      await finishWithCredentials(data.accessToken, data.accessTokenExpirationTimestampMs);
-                    }
+          if (method === "Network.responseReceived") {
+            const url = params?.response?.url || "";
+            if (url.includes("/api/token") || url.includes("/get_access_token")) {
+              try {
+                const res = await loginWindow.webContents.debugger.sendCommand("Network.getResponseBody", {
+                  requestId: params.requestId,
+                });
+                if (res?.body) {
+                  const data = JSON.parse(res.body);
+                  if (data?.accessToken && !data.isAnonymous) {
+                    await finishWithCredentials(data.accessToken, data.accessTokenExpirationTimestampMs);
                   }
-                } catch (e) {
-                  console.warn("[SpotifyAuth] Could not read response body:", e);
                 }
+              } catch (e) {
+                // Ignore transient body retrieval errors
               }
             }
-          });
-        } catch (err) {
-          console.warn("[SpotifyAuth] Debugger attach error:", err);
-        }
-      };
+          }
+        });
+      } catch (err) {
+        console.warn("[SpotifyAuth] Debugger attach error:", err);
+      }
 
+      // ── Injected early fetch hook ──
       const pageHookScript = `
         try {
           Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
@@ -144,33 +153,77 @@ export class ElectronSpotifyAuth {
         } catch(e) {}
       `;
 
-      loginWindow.webContents.on("dom-ready", async () => {
-        if (resolved) return;
-        try {
-          await loginWindow.webContents.executeJavaScript(pageHookScript);
-          
-          const currentUrl = loginWindow.webContents.getURL();
-          if (currentUrl.includes("open.spotify.com")) {
-            attachDebuggerOnSpotify();
+      // ── Layer 2 & 3: Active sp_dc Cookie Detection & In-Page Token Fetch ──
+      let isChecking = false;
+      const checkCookiesAndAuthenticate = async () => {
+        if (resolved || isChecking) return;
+        isChecking = true;
 
-            const tokenData = await loginWindow.webContents.executeJavaScript(`
-              window.__spotify_access_token_data || null
-            `);
-            if (tokenData?.accessToken && !tokenData.isAnonymous) {
-              await finishWithCredentials(tokenData.accessToken, tokenData.accessTokenExpirationTimestampMs);
+        try {
+          const allCookies = await loginSession.cookies.get({});
+          const spDcCookie = allCookies.find((c) => c.name === "sp_dc");
+
+          if (spDcCookie && spDcCookie.value) {
+            // Fast direct token generation via TOTP
+            try {
+              const tokenData = await this.authCore.getAccessToken(spDcCookie.value);
+              if (tokenData?.accessToken && !tokenData.isAnonymous) {
+                await finishWithCredentials(tokenData.accessToken, tokenData.accessTokenExpirationTimestampMs, allCookies);
+                return;
+              }
+            } catch {
+              // Continue to in-page active fetch if TOTP endpoint was unreachable
+            }
+
+            // In-page active fetch inside the authenticated Spotify session context
+            if (!loginWindow.isDestroyed()) {
+              const currentUrl = loginWindow.webContents.getURL();
+              if (currentUrl.includes("open.spotify.com")) {
+                try {
+                  const inPageToken = await loginWindow.webContents.executeJavaScript(`
+                    (async () => {
+                      try {
+                        const res = await fetch('/api/token?reason=transport&productType=web-player');
+                        if (res.ok) {
+                          const data = await res.json();
+                          if (data && data.accessToken && !data.isAnonymous) return data;
+                        }
+                      } catch(e) {}
+                      try {
+                        const res2 = await fetch('/get_access_token?reason=transport&productType=web-player');
+                        if (res2.ok) {
+                          const data2 = await res2.json();
+                          if (data2 && data2.accessToken && !data2.isAnonymous) return data2;
+                        }
+                      } catch(e) {}
+                      return window.__spotify_access_token_data || null;
+                    })()
+                  `);
+                  if (inPageToken?.accessToken && !inPageToken.isAnonymous) {
+                    await finishWithCredentials(inPageToken.accessToken, inPageToken.accessTokenExpirationTimestampMs, allCookies);
+                    return;
+                  }
+                } catch {}
+              }
             }
           }
-        } catch {}
-      });
+        } catch {
+        } finally {
+          isChecking = false;
+        }
+      };
+
+      const cookieListener = () => {
+        checkCookiesAndAuthenticate();
+      };
+      loginSession.cookies.on("changed", cookieListener);
+
+      pollInterval = setInterval(checkCookiesAndAuthenticate, 600);
 
       const handleNavigation = async (url: string) => {
         if (resolved) return;
 
-        if (url.includes("open.spotify.com")) {
-          attachDebuggerOnSpotify();
-        }
-
-        const cookies = await loginSession.cookies.get({ domain: "spotify.com" });
+        const cookies = await loginSession.cookies.get({});
         const spDcCookie = cookies.find((c) => c.name === "sp_dc");
 
         if (spDcCookie) {
@@ -178,15 +231,26 @@ export class ElectronSpotifyAuth {
             loginWindow.loadURL("https://open.spotify.com/");
           }
         }
+
+        checkCookiesAndAuthenticate();
       };
 
       loginWindow.webContents.on("did-navigate", (_event, url) => handleNavigation(url));
       loginWindow.webContents.on("did-redirect-navigation", (_event, url) => handleNavigation(url));
 
+      loginWindow.webContents.on("dom-ready", async () => {
+        if (resolved) return;
+        try {
+          await loginWindow.webContents.executeJavaScript(pageHookScript);
+        } catch {}
+        checkCookiesAndAuthenticate();
+      });
+
       loginWindow.on("page-title-updated", (e) => e.preventDefault());
 
       loginWindow.on("closed", () => {
         if (!resolved) {
+          cleanup();
           reject(new Error("Login window was closed before completion"));
         }
       });
@@ -294,6 +358,32 @@ export class ElectronSpotifyAuth {
         } catch (err) {
           console.warn("[SpotifyRefresh] Debugger attach error:", err);
         }
+
+        refreshWindow.webContents.on("dom-ready", async () => {
+          if (finished) return;
+          try {
+            const inPageToken = await refreshWindow.webContents.executeJavaScript(`
+              (async () => {
+                try {
+                  const res = await fetch('/api/token?reason=transport&productType=web-player');
+                  if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.accessToken && !data.isAnonymous) return data;
+                  }
+                } catch(e) {}
+                return null;
+              })()
+            `);
+            if (inPageToken?.accessToken && !inPageToken.isAnonymous) {
+              clearTimeout(timeout);
+              cleanup();
+              resolve({
+                accessToken: inPageToken.accessToken,
+                expiration: inPageToken.accessTokenExpirationTimestampMs || Date.now() + 3600 * 1000,
+              });
+            }
+          } catch {}
+        });
 
         refreshWindow.loadURL("https://open.spotify.com/");
       }).catch((err) => {
