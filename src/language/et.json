@@ -195,7 +195,7 @@
     "trackView.min": "min",
     "trackView.sec": "sek",
     "lyrics.searching": "Otsin laulusõnu...",
-    "lyrics.notFound": "Selle loo jaoks laulusõnu ei leidu.",
+    "lyrics.notFound": "Selle loo jaoks ei leidu laulusõnu.",
     "lyrics.error": "LRCLib'ist ei leidu laulusõnu.",
     "login.tagline": "sinu muusika, uuesti sündinud",
     "login.description": "Spotify metaandmete ökosüsteemil põhinev uue põlvkonna muusikaklient.",
